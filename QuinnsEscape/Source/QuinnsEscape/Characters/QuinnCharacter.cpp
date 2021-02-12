@@ -7,10 +7,14 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "../Projectiles/ProjectileBase.h"
 
 AQuinnCharacter::AQuinnCharacter()
 {
+	m_fireCooldown = 0.0f;
+	FireTotalCooldown = 0.4f;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -54,10 +58,25 @@ void AQuinnCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	// Actions
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AQuinnCharacter::FireProjectile);
+	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AQuinnCharacter::FireProjectile);
 
 	// Axis
 	PlayerInputComponent->BindAxis("MoveRight", this, &AQuinnCharacter::MoveRight);
+}
+
+void AQuinnCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+void AQuinnCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Reduce cooldown every tick
+	if (m_fireCooldown > 0)
+		m_fireCooldown -= DeltaTime;
 }
 
 void AQuinnCharacter::MoveRight(float Value)
@@ -66,10 +85,15 @@ void AQuinnCharacter::MoveRight(float Value)
 	AddMovementInput(FVector(0.f, -1.f, 0.f), Value);
 }
 
-void AQuinnCharacter::FireProjectile()
+void AQuinnCharacter::FireProjectile(FVector direction)
 {
-	// Check projectile reference is valid and exists
-	UE_LOG(LogTemp, Log, TEXT("Firing projectile!"));
+	// Check if firing is currently on cooldown or not
+	if (m_fireCooldown > 0)
+	{
+		return;
+	}
+
+	//UE_LOG(LogTemp, Log, TEXT("Firing projectile!"));
 
 	// Create spawn location with offset and spawn into world
 	float offset = 75.0f;
@@ -80,10 +104,15 @@ void AQuinnCharacter::FireProjectile()
 	AProjectileBase* projectile = Cast<AProjectileBase>(projectileActor);
 	if (IsValid(projectile))
 	{
+		// Projectile should ignore class that fires it
+		projectile->AddActorToIgnore(this);
 		// Set speed and life span
 		projectile->SetSpeed(250.0f);
 		projectile->SetLifeSpan(5.0f);
 		// Launch in direction
-		projectile->FireInDirection(GetActorForwardVector());
+		projectile->FireInDirection(direction);
 	}
+
+	// Set firing on cooldown
+	m_fireCooldown = FireTotalCooldown;
 }

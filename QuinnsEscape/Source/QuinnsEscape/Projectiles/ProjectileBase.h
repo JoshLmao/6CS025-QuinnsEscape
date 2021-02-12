@@ -42,6 +42,8 @@ private:
 
 	// Amount of damage to deal out to the recieveing actor
 	float m_damage;
+	// Class to ignore in overlap
+	class UClass* m_ignoreClass;
 
 	/*
 	*	METHODS
@@ -59,6 +61,9 @@ public:
 
 	// Fires the projectile in the direction
 	void FireInDirection(FVector fireDirection);
+	
+	// Add an actor to ignore on the root capsule component
+	void AddActorToIgnore(AActor* actor);
 
 protected:
 	// Called when collider begins to overlaps any actor

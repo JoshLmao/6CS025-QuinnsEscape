@@ -30,10 +30,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	// Total cooldown in seconds in between firing each projectile
+	UPROPERTY(EditAnywhere)
+	float FireTotalCooldown;
+
 private:
 	// Actor to use to fur
 	UPROPERTY(EditAnywhere)
 	class AActor* ProjectileActor;
+
+	// Current cooldown of firing a projectile
+	float m_fireCooldown;
 
 	/*
 	*	METHODS
@@ -44,14 +51,17 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
+	// Fires a projectile in the destined direction
+	void FireProjectile(FVector direction);
+
 protected:
+	// BeginPlay function called on Actor begin
+	virtual void BeginPlay() override;
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	// Tick function called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	// Called for side to side input
 	void MoveRight(float Val);
-
-private:
-	// Fires a projectile
-	void FireProjectile();
 };

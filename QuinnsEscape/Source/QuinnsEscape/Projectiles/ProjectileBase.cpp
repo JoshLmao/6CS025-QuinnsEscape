@@ -86,9 +86,21 @@ void AProjectileBase::FireInDirection(FVector fireDirection)
 	m_projectileMovementComponent->Velocity = fireDirection * m_projectileMovementComponent->InitialSpeed;
 }
 
+void AProjectileBase::AddActorToIgnore(AActor* actor)
+{
+	m_rootCapsuleComponent->IgnoreActorWhenMoving(actor, true);
+}
+
 void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// Check other actor is an actor that 
+	// Check if other actor is of class that should be ignored
+	if (OtherActor->IsA(m_ignoreClass->StaticClass()))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Projectile '%s' ignores actor '%s'"), *this->GetName(), *OtherActor->GetName());
+		return;
+	}
+
+	// Check other actor is an actor that contains health
 	if (OtherActor->IsA(AHealthCharacter::StaticClass()))
 	{
 		// Actor is a HealthCharacter
