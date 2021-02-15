@@ -26,8 +26,23 @@ void AQuinnPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("Fire", IE_Pressed, this, &AQuinnPlayerController::OnFireReleased);
+	// Input Actions
+	InputComponent->BindAction("Fire", IE_Released, this, &AQuinnPlayerController::OnFireReleased);
+	InputComponent->BindAction("Slam", IE_Released, this, &AQuinnPlayerController::OnSlamReleased);
+}
 
+void AQuinnPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+
+	QuinnCharacter = Cast<AQuinnCharacter>(aPawn);
+}
+
+void AQuinnPlayerController::OnUnPossess()
+{
+	Super::OnUnPossess();
+
+	QuinnCharacter = nullptr;
 }
 
 void AQuinnPlayerController::OnFireReleased()
@@ -45,6 +60,10 @@ void AQuinnPlayerController::OnFireReleased()
 	FVector fireDirectionVector = lookAtRotator.Vector();
 
 	// Fire projectile towards to direction
-	AQuinnCharacter* character = Cast<AQuinnCharacter>(GetPawn());
-	character->FireProjectile(fireDirectionVector);
+	QuinnCharacter->FireProjectile(fireDirectionVector);
+}
+
+void AQuinnPlayerController::OnSlamReleased()
+{
+	QuinnCharacter->SlamGround();
 }

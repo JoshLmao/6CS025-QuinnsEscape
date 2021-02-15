@@ -33,14 +33,33 @@ protected:
 	// Total cooldown in seconds in between firing each projectile
 	UPROPERTY(EditAnywhere)
 	float FireTotalCooldown;
+	UPROPERTY(EditAnywhere)
+	float SlamTotalCooldown;
+
+	// Speed that the projectile is fired at
+	UPROPERTY(EditAnywhere)
+	float ProjectileSpeed;
+	// Amount of damage to deal to an enemy if the player lands on their head
+	UPROPERTY(EditAnywhere)
+	float HeadJumpDamage;
+	// Amount multiplier to add to the HeadJumpDamage if the player slams onto an enemy head
+	UPROPERTY(EditAnywhere)
+	float SlamMultiplier;
 
 private:
 	// Actor to use to fur
 	UPROPERTY(EditAnywhere)
 	class AActor* ProjectileActor;
 
+	UPROPERTY(EditAnywhere)
+	class UCapsuleComponent* SlamCapsuleComponent;
+
 	// Current cooldown of firing a projectile
 	float m_fireCooldown;
+	// Current cooldown of slam ability
+	float m_slamCooldown;
+
+	bool m_isSlamingGround;
 
 	/*
 	*	METHODS
@@ -54,6 +73,9 @@ public:
 	// Fires a projectile in the destined direction
 	void FireProjectile(FVector direction);
 
+	// Slams into the ground below the character
+	void SlamGround();
+
 protected:
 	// BeginPlay function called on Actor begin
 	virtual void BeginPlay() override;
@@ -64,4 +86,8 @@ protected:
 
 	// Called for side to side input
 	void MoveRight(float Val);
+
+private:
+	UFUNCTION()
+	void OnSlamCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

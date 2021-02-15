@@ -13,7 +13,12 @@
 AQuinnCharacter::AQuinnCharacter()
 {
 	m_fireCooldown = 0.0f;
+	m_slamCooldown = 0.0f;
 	FireTotalCooldown = 0.4f;
+	SlamTotalCooldown = 1.0f;
+	ProjectileSpeed = 750.0f;
+	HeadJumpDamage = 25.0f;
+	SlamMultiplier = 1.35f;
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -48,6 +53,16 @@ AQuinnCharacter::AQuinnCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
+	// Configure Slam collider places below the character
+	SlamCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("SlamCapsule"));
+	SlamCapsuleComponent->SetupAttachment(RootComponent);
+	SlamCapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &AQuinnCharacter::OnSlamCapsuleBeginOverlap);
+	SlamCapsuleComponent->SetCollisionProfileName("OverlapAllDynamic");
+	SlamCapsuleComponent->SetGenerateOverlapEvents(true);
+	SlamCapsuleComponent->AddLocalOffset(FVector(0, 0, -90.0f));
+	SlamCapsuleComponent->SetCapsuleHalfHeight(44.0f);
+	SlamCapsuleComponent->SetCapsuleRadius(44.0f);
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -74,9 +89,21 @@ void AQuinnCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Lock the X axis to 0
+	FVector actorLocation = GetActorLocation();
+	SetActorLocation(FVector(0, actorLocation.Y, actorLocation.Z));
+
 	// Reduce cooldown every tick
 	if (m_fireCooldown > 0)
 		m_fireCooldown -= DeltaTime;
+	if (m_slamCooldown > 0)
+		m_slamCooldown -= DeltaTime;
+
+	if (m_isSlamingGround && !GetCharacterMovement()->IsFalling())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Slam finished"));
+		m_isSlamingGround = false;
+	}
 }
 
 void AQuinnCharacter::MoveRight(float Value)
@@ -96,9 +123,15 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 	//UE_LOG(LogTemp, Log, TEXT("Firing projectile!"));
 
 	// Create spawn location with offset and spawn into world
-	float offset = 75.0f;
-	FVector spawnLocation = GetActorLocation() + (GetActorForwardVector() * offset);
-	AActor* projectileActor = GetWorld()->SpawnActor<AActor>(AProjectileBase::StaticClass(), spawnLocation, FRotator(), FActorSpawnParameters());
+	float offset = 100.0f;
+	FVector forwardVector = direction - GetActorLocation();
+	forwardVector.Normalize();
+
+	FVector spawnLocation = GetActorLocation() + (forwardVector * offset);
+	spawnLocation.X = GetActorLocation().X;
+	spawnLocation.Z += 50.0f; // add height offset
+
+	AActor* projectileActor = GetWorld()->SpawnActor<AActor>(AProjectileBase::StaticClass(), FVector(), FRotator(), FActorSpawnParameters());
 	
 	// Cast to projectile and configure
 	AProjectileBase* projectile = Cast<AProjectileBase>(projectileActor);
@@ -107,12 +140,51 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 		// Projectile should ignore class that fires it
 		projectile->AddActorToIgnore(this);
 		// Set speed and life span
-		projectile->SetSpeed(250.0f);
+		projectile->SetSpeed(ProjectileSpeed);
 		projectile->SetLifeSpan(5.0f);
 		// Launch in direction
 		projectile->FireInDirection(direction);
+
+		projectileActor->SetActorLocation(spawnLocation);
 	}
 
 	// Set firing on cooldown
 	m_fireCooldown = FireTotalCooldown;
+}
+
+
+void AQuinnCharacter::SlamGround()
+{
+	// Check if slam is on cooldown
+	if (m_slamCooldown > 0)
+	{
+		return;
+	}
+
+	// Slam down direction with force
+	FVector downDirection = -GetActorUpVector();
+	float slamForce = 2000.0f;
+	LaunchCharacter(downDirection * slamForce, false, true);
+
+	m_slamCooldown = SlamTotalCooldown;
+	m_isSlamingGround = true;
+}
+
+void AQuinnCharacter::OnSlamCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	/*
+	* Player jumps on head of another actor
+	*/
+
+	// Check if actor is an enemy that can take damage
+	if (OtherActor->IsA(AHealthCharacter::StaticClass()))
+	{
+		// Calculate damage
+		float dmg = HeadJumpDamage;
+		if (m_isSlamingGround)
+			dmg *= SlamMultiplier;
+
+		// TakeDamage
+		OtherActor->TakeDamage(dmg, FDamageEvent(), GetController(), this);
+	}
 }

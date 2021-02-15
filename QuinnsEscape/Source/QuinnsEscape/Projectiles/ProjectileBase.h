@@ -34,10 +34,13 @@ public:
 	*/
 private:
 	// Root capsule component to handle colliding
+	UPROPERTY(EditAnywhere)
 	class UCapsuleComponent* m_rootCapsuleComponent;
 	// Component to handle moving actor as a projectile
+	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* m_projectileMovementComponent;
 	// Mesh representation for the projectile
+	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* m_meshComponent;
 
 	// Amount of damage to deal out to the recieveing actor

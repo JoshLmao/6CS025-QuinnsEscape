@@ -88,7 +88,8 @@ void AProjectileBase::FireInDirection(FVector fireDirection)
 
 void AProjectileBase::AddActorToIgnore(AActor* actor)
 {
-	m_rootCapsuleComponent->IgnoreActorWhenMoving(actor, true);
+	m_ignoreClass = actor->StaticClass();
+	m_rootCapsuleComponent->MoveIgnoreActors.Add(actor);
 }
 
 void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -103,12 +104,15 @@ void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComp
 	// Check other actor is an actor that contains health
 	if (OtherActor->IsA(AHealthCharacter::StaticClass()))
 	{
+		AHealthCharacter* cast = Cast<AHealthCharacter>(OtherActor);
 		// Actor is a HealthCharacter
 		OtherActor->TakeDamage(GetDamage(), FDamageEvent(), nullptr, this);
+
+		UE_LOG(LogTemp, Log, TEXT("Projectile '%s' collided with Character '%s' and dealth '%f' damage (%f/%f)"), *this->GetName(), *OtherActor->GetName(), GetDamage(), cast->GetCurrentHealth(), cast->GetTotalHealth());
 	}
 	
 	// Destroy projectile as it's collided with another actor
-	this->Destroy();
+	//this->Destroy();
 }
 
 void AProjectileBase::OnColliderEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
