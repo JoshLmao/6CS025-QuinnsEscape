@@ -49,7 +49,8 @@ private:
 	float m_currentHealth;
 	// Total health of the character
 	float m_totalHealth;
-
+	// If this character can be stomped
+	bool m_canRecieveStomp;
 
 	/*
 	*	EVENTS
@@ -72,6 +73,13 @@ public:
 	float GetTotalHealth();
 	// Set the total health of the character
 	void SetTotalHealth(float health);
+	
+	// Can this character recieve being jumped on the head of
+	bool CanRecieveStomp();
+	// Set if this character can be stomped
+	void SetCanRecieveStomp(bool canBeStomped);
+	// Deal a stomp to this character and return if successfuly dealth damage
+	bool TakeStomp(float damage);
 
 protected:
 	// Overridable method called when character has died

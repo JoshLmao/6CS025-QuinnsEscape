@@ -2,6 +2,7 @@
 
 
 #include "HealthCharacter.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AHealthCharacter::AHealthCharacter()
@@ -12,6 +13,11 @@ AHealthCharacter::AHealthCharacter()
 	// Set the total and current health to default values on start
 	m_currentHealth = 0;
 	m_totalHealth = 100;
+
+	//Enable overlap events on capsule
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+	// Set charatcer to recieve stomp
+	this->SetCanRecieveStomp(true);
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +69,19 @@ float AHealthCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 	return damage;
 }
 
+bool AHealthCharacter::TakeStomp(float damage)
+{
+	// Check if this character can be stomped
+	if (this->CanRecieveStomp())
+	{
+		// Deal the damage
+		float dmg = this->TakeDamage(damage, FDamageEvent(), nullptr, nullptr);
+		return dmg > 0;
+	}
+
+	return false;
+}
+
 void AHealthCharacter::OnHealthCharacterDeath()
 {
 	// Empty, can be used by higher classes
@@ -84,4 +103,14 @@ float AHealthCharacter::GetTotalHealth()
 void AHealthCharacter::SetTotalHealth(float health)
 {
 	m_totalHealth = health;
+}
+
+bool AHealthCharacter::CanRecieveStomp()
+{
+	return m_canRecieveStomp;
+}
+
+void AHealthCharacter::SetCanRecieveStomp(bool canBeStomped)
+{
+	m_canRecieveStomp = canBeStomped;
 }

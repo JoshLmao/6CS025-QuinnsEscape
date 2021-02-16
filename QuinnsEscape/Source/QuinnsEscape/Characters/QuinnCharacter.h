@@ -47,19 +47,22 @@ protected:
 	float SlamMultiplier;
 
 private:
-	// Actor to use to fur
+	// Actor to use to as a projectile fired from the character
 	UPROPERTY(EditAnywhere)
-	class AActor* ProjectileActor;
-
+	TSubclassOf<class AActor> ProjectileActor;
+	// Sphere Component placed below character to detect stomps
 	UPROPERTY(EditAnywhere)
-	class UCapsuleComponent* SlamCapsuleComponent;
+	class USphereComponent* StompSphereComponent;
 
 	// Current cooldown of firing a projectile
 	float m_fireCooldown;
 	// Current cooldown of slam ability
 	float m_slamCooldown;
 
+	// Is the character currently slamming down to the ground
 	bool m_isSlamingGround;
+	// Has any damage been applied during this jump
+	bool m_hasAppliedDmgThisJump;
 
 	/*
 	*	METHODS
@@ -72,7 +75,6 @@ public:
 
 	// Fires a projectile in the destined direction
 	void FireProjectile(FVector direction);
-
 	// Slams into the ground below the character
 	void SlamGround();
 
@@ -83,11 +85,14 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// Tick function called every frame
 	virtual void Tick(float DeltaTime) override;
+	// Jump function to force character in air
+	virtual void Jump() override;
 
 	// Called for side to side input
 	void MoveRight(float Val);
 
 private:
 	UFUNCTION()
-	void OnSlamCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnStompCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 };

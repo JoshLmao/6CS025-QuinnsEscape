@@ -4,6 +4,7 @@
 #include "QuinnCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -53,15 +54,18 @@ AQuinnCharacter::AQuinnCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
-	// Configure Slam collider places below the character
-	SlamCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("SlamCapsule"));
-	SlamCapsuleComponent->SetupAttachment(RootComponent);
-	SlamCapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &AQuinnCharacter::OnSlamCapsuleBeginOverlap);
-	SlamCapsuleComponent->SetCollisionProfileName("OverlapAllDynamic");
-	SlamCapsuleComponent->SetGenerateOverlapEvents(true);
-	SlamCapsuleComponent->AddLocalOffset(FVector(0, 0, -90.0f));
-	SlamCapsuleComponent->SetCapsuleHalfHeight(44.0f);
-	SlamCapsuleComponent->SetCapsuleRadius(44.0f);
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AQuinnCharacter::OnStompCapsuleBeginOverlap);
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+
+	// Configure Stomp collider to be placed below the character
+	StompSphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SlamCapsule"));
+	StompSphereComponent->SetupAttachment(RootComponent);
+	StompSphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AQuinnCharacter::OnStompCapsuleBeginOverlap);
+	// Overlap with all channels cause setting a profile name doesnt work
+	StompSphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	StompSphereComponent->SetGenerateOverlapEvents(true);
+	StompSphereComponent->AddLocalOffset(FVector(0, 0, -100.0f));
+	StompSphereComponent->SetSphereRadius(44.0f);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -71,7 +75,7 @@ void AQuinnCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 {
 	// set up gameplay key bindings
 	// Actions
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AQuinnCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AQuinnCharacter::FireProjectile);
 
@@ -104,6 +108,14 @@ void AQuinnCharacter::Tick(float DeltaTime)
 		UE_LOG(LogTemp, Log, TEXT("Slam finished"));
 		m_isSlamingGround = false;
 	}
+}
+
+void AQuinnCharacter::Jump()
+{
+	// Set flags to false on jump init
+	m_hasAppliedDmgThisJump = m_isSlamingGround = false;
+
+	Super::Jump();
 }
 
 void AQuinnCharacter::MoveRight(float Value)
@@ -166,25 +178,48 @@ void AQuinnCharacter::SlamGround()
 	float slamForce = 2000.0f;
 	LaunchCharacter(downDirection * slamForce, false, true);
 
+	// Set on cooldown and slam flag
 	m_slamCooldown = SlamTotalCooldown;
 	m_isSlamingGround = true;
 }
 
-void AQuinnCharacter::OnSlamCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AQuinnCharacter::OnStompCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	/*
-	* Player jumps on head of another actor
+	* Player stomps on head of another character
 	*/
+
+	// Dont apply damage to self
+	if (OtherActor == this) 
+	{
+		return;
+	}
 
 	// Check if actor is an enemy that can take damage
 	if (OtherActor->IsA(AHealthCharacter::StaticClass()))
 	{
-		// Calculate damage
-		float dmg = HeadJumpDamage;
-		if (m_isSlamingGround)
-			dmg *= SlamMultiplier;
+		AHealthCharacter* healthChar = Cast<AHealthCharacter>(OtherActor);
+		// If no damage has been applied this jump...
+		if (!m_hasAppliedDmgThisJump)
+		{
+			// Calculate damage for a stomp
+			float dmg = HeadJumpDamage;
+			if (m_isSlamingGround)
+			{
+				// Add slam multiplier to damage
+				dmg *= SlamMultiplier;
 
-		// TakeDamage
-		OtherActor->TakeDamage(dmg, FDamageEvent(), GetController(), this);
+				// Collided with enemy, end slam
+				m_isSlamingGround = false;
+			}
+
+			// Deal stomp damage to the character
+			bool dealtDmg = healthChar->TakeStomp(dmg);
+			if (dealtDmg)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Dealt '%f' damage to '%s' since stomped on head"), dmg, *OtherActor->GetName());
+				m_hasAppliedDmgThisJump = true;
+			}
+		}
 	}
 }
