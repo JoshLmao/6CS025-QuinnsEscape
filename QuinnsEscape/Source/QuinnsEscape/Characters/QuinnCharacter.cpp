@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "DrawDebugHelpers.h"
 #include "../Projectiles/ProjectileBase.h"
 
 AQuinnCharacter::AQuinnCharacter()
@@ -135,15 +136,22 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 	//UE_LOG(LogTemp, Log, TEXT("Firing projectile!"));
 
 	// Create spawn location with offset and spawn into world
-	float offset = 100.0f;
 	FVector forwardVector = direction - GetActorLocation();
 	forwardVector.Normalize();
 
-	FVector spawnLocation = GetActorLocation() + (forwardVector * offset);
-	spawnLocation.X = GetActorLocation().X;
-	spawnLocation.Z += 50.0f; // add height offset
+	float halfHeight, radius;
+	GetCapsuleComponent()->GetScaledCapsuleSize(radius, halfHeight);
 
-	AActor* projectileActor = GetWorld()->SpawnActor<AActor>(AProjectileBase::StaticClass(), FVector(), FRotator(), FActorSpawnParameters());
+	// Determine location to be in the middle of character
+	FVector actorLoc = GetActorLocation();
+	FVector heightOffset = GetActorUpVector() * (halfHeight / 2);
+	FVector spawnLocation = actorLoc + heightOffset;
+	spawnLocation.X = GetActorLocation().X;
+
+	//DrawDebugSphere(GetWorld(), spawnLocation, 20.0f, 4, FColor::Green, false, 5.0f, 0, 2.0f);
+
+	// Spawn blueprint template projectile actor
+	AActor* projectileActor = GetWorld()->SpawnActor(ProjectileActor->GetDefaultObject()->GetClass());
 	
 	// Cast to projectile and configure
 	AProjectileBase* projectile = Cast<AProjectileBase>(projectileActor);
@@ -157,7 +165,7 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 		// Launch in direction
 		projectile->FireInDirection(direction);
 
-		projectileActor->SetActorLocation(spawnLocation);
+		projectileActor->SetActorLocation(spawnLocation, false);
 	}
 
 	// Set firing on cooldown

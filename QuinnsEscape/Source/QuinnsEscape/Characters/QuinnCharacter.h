@@ -49,7 +49,7 @@ protected:
 private:
 	// Actor to use to as a projectile fired from the character
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AActor> ProjectileActor;
+	TSubclassOf<class AProjectileBase> ProjectileActor;
 	// Sphere Component placed below character to detect stomps
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* StompSphereComponent;

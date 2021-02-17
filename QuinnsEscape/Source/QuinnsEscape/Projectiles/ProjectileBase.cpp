@@ -25,14 +25,11 @@ AProjectileBase::AProjectileBase()
 	// Configure root collider
 	m_rootCapsuleComponent->SetCapsuleHalfHeight(30.0f);
 	m_rootCapsuleComponent->SetCapsuleRadius(30.0f);
-	m_rootCapsuleComponent->bHiddenInGame = false;
-
+	//m_rootCapsuleComponent->bHiddenInGame = false; //display for debug purposes
+	m_rootCapsuleComponent->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+	// Listen to begin and end overlap events
 	m_rootCapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &AProjectileBase::OnColliderBeginOverlap);
 	m_rootCapsuleComponent->OnComponentEndOverlap.AddDynamic(this, &AProjectileBase::OnColliderEndOverlap);
-
-	// Configure Mesh
-	m_meshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	m_meshComponent->SetupAttachment(RootComponent);
 
 	// Add and configure projectile movement component
 	m_projectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
@@ -43,7 +40,6 @@ AProjectileBase::AProjectileBase()
 	m_projectileMovementComponent->bShouldBounce = true;
 	m_projectileMovementComponent->Bounciness = 0.3f;
 	m_projectileMovementComponent->ProjectileGravityScale = 0.0f;
-	
 }
 
 // Called when the game starts or when spawned
@@ -75,7 +71,6 @@ float AProjectileBase::GetDamage()
 {
 	return m_damage;
 }
-
 void AProjectileBase::SetDamage(float damage)
 {
 	m_damage = damage;
@@ -88,17 +83,22 @@ void AProjectileBase::FireInDirection(FVector fireDirection)
 
 void AProjectileBase::AddActorToIgnore(AActor* actor)
 {
-	m_ignoreClass = actor->StaticClass();
-	m_rootCapsuleComponent->MoveIgnoreActors.Add(actor);
+	m_ignoreActors.Add(actor);
 }
 
 void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// Check if other actor is of class that should be ignored
-	if (OtherActor->IsA(m_ignoreClass->StaticClass()))
+	if (m_ignoreActors.Num() > 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Projectile '%s' ignores actor '%s'"), *this->GetName(), *OtherActor->GetName());
-		return;
+		for (AActor* actor : m_ignoreActors)
+		{
+			if (OtherActor == actor)
+			{
+				//UE_LOG(LogTemp, Log, TEXT("Projectile '%s' ignores actor '%s'"), *this->GetName(), *OtherActor->GetName());
+				return;
+			}
+		}
 	}
 
 	// Check other actor is an actor that contains health
@@ -109,10 +109,10 @@ void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComp
 		OtherActor->TakeDamage(GetDamage(), FDamageEvent(), nullptr, this);
 
 		UE_LOG(LogTemp, Log, TEXT("Projectile '%s' collided with Character '%s' and dealth '%f' damage (%f/%f)"), *this->GetName(), *OtherActor->GetName(), GetDamage(), cast->GetCurrentHealth(), cast->GetTotalHealth());
+
+		// Destroy projectile as it's collided with another actor
+		this->Destroy();
 	}
-	
-	// Destroy projectile as it's collided with another actor
-	//this->Destroy();
 }
 
 void AProjectileBase::OnColliderEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

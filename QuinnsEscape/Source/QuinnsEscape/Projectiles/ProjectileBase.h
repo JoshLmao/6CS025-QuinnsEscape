@@ -39,14 +39,11 @@ private:
 	// Component to handle moving actor as a projectile
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* m_projectileMovementComponent;
-	// Mesh representation for the projectile
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* m_meshComponent;
 
 	// Amount of damage to deal out to the recieveing actor
 	float m_damage;
 	// Class to ignore in overlap
-	class UClass* m_ignoreClass;
+	TArray<class AActor*> m_ignoreActors;
 
 	/*
 	*	METHODS
