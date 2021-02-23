@@ -21,6 +21,10 @@ public:
 	/*
 	*	VARIABLES
 	*/
+public:
+	// Amount of lives the player currently has
+	int CurrentLives;
+
 protected:
 	// Side view camera 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -45,6 +49,10 @@ protected:
 	// Amount multiplier to add to the HeadJumpDamage if the player slams onto an enemy head
 	UPROPERTY(EditAnywhere)
 	float SlamMultiplier;
+
+	// How many lives the player starts with
+	UPROPERTY(EditAnywhere)
+	int StartLives;
 
 private:
 	// Actor to use to as a projectile fired from the character
@@ -87,6 +95,8 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	// Jump function to force character in air
 	virtual void Jump() override;
+
+	virtual bool OnCharacterDeath() override;
 
 	// Called for side to side input
 	void MoveRight(float Val);

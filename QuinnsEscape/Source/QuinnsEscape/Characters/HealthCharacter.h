@@ -82,7 +82,13 @@ public:
 	bool TakeStomp(float damage);
 
 protected:
-	// Overridable method called when character has died
-	virtual void OnHealthCharacterDeath();
+	// Overridable method called when character has died. Returns bool of if the character should die or not
+	virtual bool OnCharacterDeath();
+	// Override falling out of the world
+	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
+
+private:
+	// Deals an amount of damage to the character
+	void DealDamage(float damage);
 
 };

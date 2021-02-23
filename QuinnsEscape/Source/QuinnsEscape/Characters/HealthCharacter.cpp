@@ -47,7 +47,26 @@ void AHealthCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 float AHealthCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float damage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	
+	// Deal amount to player
+	DealDamage(damage);
 
+	return damage;
+}
+
+void AHealthCharacter::FellOutOfWorld(const UDamageType& dmgType)
+{
+	// Deal massive damage if falling out of world
+	DealDamage(99999.0f);
+
+	if (m_currentHealth <= 0)
+	{
+		Super::FellOutOfWorld(dmgType);
+	}
+}
+
+void AHealthCharacter::DealDamage(float damage)
+{
 	// Reduce health by damage amount 
 	m_currentHealth -= damage;
 
@@ -57,16 +76,19 @@ float AHealthCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		m_currentHealth = 0;
 
 		// Call any overrides in parent class
-		OnHealthCharacterDeath();
+		bool isDead = OnCharacterDeath();
 
-		// Broadcast event if anyone is listening
-		if (OnCharacterDied.IsBound())
+		UE_LOG(LogTemp, Log, TEXT("%s IsDead = %d"), *GetName(), isDead ? 1 : 0);
+		// If character should die, continue death
+		if (isDead)
 		{
-			OnCharacterDied.Broadcast();
+			// Broadcast event if anyone is listening
+			if (OnCharacterDied.IsBound())
+			{
+				OnCharacterDied.Broadcast();
+			}
 		}
 	}
-
-	return damage;
 }
 
 bool AHealthCharacter::TakeStomp(float damage)
@@ -82,9 +104,9 @@ bool AHealthCharacter::TakeStomp(float damage)
 	return false;
 }
 
-void AHealthCharacter::OnHealthCharacterDeath()
+bool AHealthCharacter::OnCharacterDeath()
 {
-	// Empty, can be used by higher classes
+	return true; // Kill character on death
 }
 
 float AHealthCharacter::GetCurrentHealth()

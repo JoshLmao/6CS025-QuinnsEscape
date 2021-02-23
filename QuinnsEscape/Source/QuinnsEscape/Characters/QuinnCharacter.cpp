@@ -22,6 +22,9 @@ AQuinnCharacter::AQuinnCharacter()
 	HeadJumpDamage = 25.0f;
 	SlamMultiplier = 1.35f;
 
+	CurrentLives = 0;
+	StartLives = 3;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -88,6 +91,7 @@ void AQuinnCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CurrentLives = StartLives;
 }
 
 void AQuinnCharacter::Tick(float DeltaTime)
@@ -123,6 +127,36 @@ void AQuinnCharacter::MoveRight(float Value)
 {
 	// add movement in that direction
 	AddMovementInput(FVector(0.f, -1.f, 0.f), Value);
+}
+
+bool AQuinnCharacter::OnCharacterDeath()
+{
+	bool isDead = Super::OnCharacterDeath();
+
+	// Check if all lives have been used
+	if (CurrentLives > 0)
+	{
+		CurrentLives -= 1;
+
+		isDead = CurrentLives <= 0;
+	}
+
+	if (isDead)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Quinn has no lives remaining"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Quinn lost a life (%d/%d remaining). Respawning"), CurrentLives, StartLives);
+
+		// Set health back to full
+		SetCurrentHealth(GetTotalHealth());
+
+		// Set actors location to start location
+		SetActorLocation(FVector(0, 110, 230));
+	}
+
+	return isDead;
 }
 
 void AQuinnCharacter::FireProjectile(FVector direction)
