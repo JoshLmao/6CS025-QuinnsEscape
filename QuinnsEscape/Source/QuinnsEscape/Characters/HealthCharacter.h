@@ -51,6 +51,8 @@ private:
 	float m_totalHealth;
 	// If this character can be stomped
 	bool m_canRecieveStomp;
+	// Should the character be destroyed when falling out of world
+	bool m_shouldDestroyOnFall;
 
 	/*
 	*	EVENTS
@@ -73,7 +75,11 @@ public:
 	float GetTotalHealth();
 	// Set the total health of the character
 	void SetTotalHealth(float health);
-	
+	// Get if the character should be destroyed when falling out of level
+	bool GetDestroyOnFall();
+	// Set if the character should be destroyed when falling out of level
+	void SetDestroyOnFall(bool shouldDestroy);
+
 	// Can this character recieve being jumped on the head of
 	bool CanRecieveStomp();
 	// Set if this character can be stomped

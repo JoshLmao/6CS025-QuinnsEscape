@@ -92,6 +92,7 @@ void AQuinnCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentLives = StartLives;
+	SetDestroyOnFall(false);
 }
 
 void AQuinnCharacter::Tick(float DeltaTime)
@@ -223,6 +224,16 @@ void AQuinnCharacter::SlamGround()
 	// Set on cooldown and slam flag
 	m_slamCooldown = SlamTotalCooldown;
 	m_isSlamingGround = true;
+}
+
+int AQuinnCharacter::GetCurrentLives()
+{
+	return CurrentLives;
+}
+
+int AQuinnCharacter::GetTotalLives()
+{
+	return StartLives;
 }
 
 void AQuinnCharacter::OnStompCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

@@ -86,6 +86,11 @@ public:
 	// Slams into the ground below the character
 	void SlamGround();
 
+	// Gets the current lives of Quinn
+	int GetCurrentLives();
+	// Gets the total lives of Quinn
+	int GetTotalLives();
+
 protected:
 	// BeginPlay function called on Actor begin
 	virtual void BeginPlay() override;

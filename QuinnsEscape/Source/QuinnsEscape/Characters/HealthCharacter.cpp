@@ -59,7 +59,8 @@ void AHealthCharacter::FellOutOfWorld(const UDamageType& dmgType)
 	// Deal massive damage if falling out of world
 	DealDamage(99999.0f);
 
-	if (m_currentHealth <= 0)
+	// Only call super to destroy if should be destroyed
+	if (m_currentHealth <= 0 && GetDestroyOnFall())
 	{
 		Super::FellOutOfWorld(dmgType);
 	}
@@ -135,4 +136,15 @@ bool AHealthCharacter::CanRecieveStomp()
 void AHealthCharacter::SetCanRecieveStomp(bool canBeStomped)
 {
 	m_canRecieveStomp = canBeStomped;
+}
+
+bool AHealthCharacter::GetDestroyOnFall()
+{
+	return m_shouldDestroyOnFall;
+}
+
+// Set if the character should be destroyed when falling out of level
+void AHealthCharacter::SetDestroyOnFall(bool shouldDestroy)
+{
+	m_shouldDestroyOnFall = shouldDestroy;
 }
