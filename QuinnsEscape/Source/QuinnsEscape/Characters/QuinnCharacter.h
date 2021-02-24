@@ -54,6 +54,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	int StartLives;
 
+	// Last checkpoint the player passed through
+	class ACheckpoint* LastCheckpoint;
+
 private:
 	// Actor to use to as a projectile fired from the character
 	UPROPERTY(EditAnywhere)
@@ -90,6 +93,9 @@ public:
 	int GetCurrentLives();
 	// Gets the total lives of Quinn
 	int GetTotalLives();
+
+	class ACheckpoint* GetLastCheckpoint();
+	void SetCheckpoint(class ACheckpoint* checkpoint);
 
 protected:
 	// BeginPlay function called on Actor begin

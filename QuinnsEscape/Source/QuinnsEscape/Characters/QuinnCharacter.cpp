@@ -10,7 +10,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "DrawDebugHelpers.h"
+
 #include "../Projectiles/ProjectileBase.h"
+#include "../World/Checkpoint.h"
 
 AQuinnCharacter::AQuinnCharacter()
 {
@@ -24,6 +26,7 @@ AQuinnCharacter::AQuinnCharacter()
 
 	CurrentLives = 0;
 	StartLives = 3;
+	LastCheckpoint = nullptr;		// Nullptr to start with
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -154,7 +157,19 @@ bool AQuinnCharacter::OnCharacterDeath()
 		SetCurrentHealth(GetTotalHealth());
 
 		// Set actors location to start location
-		SetActorLocation(FVector(0, 110, 230));
+		ACheckpoint* checkpoint = GetLastCheckpoint();
+		if (checkpoint)
+		{
+			// Set position to last checkpoint
+			SetActorLocation(checkpoint->GetActorLocation());
+		}
+		else
+		{
+			// Set to spawn location
+			// Needs changing to variable
+			SetActorLocation(FVector(0, 110, 230));
+		}
+		
 	}
 
 	return isDead;
@@ -165,6 +180,13 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 	// Check if firing is currently on cooldown or not
 	if (m_fireCooldown > 0)
 	{
+		return;
+	}
+
+	// Check projectile has been set
+	if (!ProjectileActor)
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Projectile actor has been set!"));
 		return;
 	}
 
@@ -234,6 +256,16 @@ int AQuinnCharacter::GetCurrentLives()
 int AQuinnCharacter::GetTotalLives()
 {
 	return StartLives;
+}
+
+ACheckpoint* AQuinnCharacter::GetLastCheckpoint()
+{
+	return LastCheckpoint;
+}
+
+void AQuinnCharacter::SetCheckpoint(ACheckpoint* checkpoint)
+{
+	LastCheckpoint = checkpoint;
 }
 
 void AQuinnCharacter::OnStompCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
