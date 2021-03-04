@@ -5,12 +5,14 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Controllers/QuinnPlayerController.h"
 
+#include "Player\QuinnPlayerState.h"
 #include "UI/Level0HUD.h"
 
 AQuinnsEscapeGameMode::AQuinnsEscapeGameMode()
 {
 	// Set default player controller to custom one
 	PlayerControllerClass = AQuinnPlayerController::StaticClass();
+	PlayerStateClass = AQuinnPlayerState::StaticClass();
 	HUDClass = ALevel0HUD::StaticClass();
 
 	// set default pawn class to our Blueprinted character
