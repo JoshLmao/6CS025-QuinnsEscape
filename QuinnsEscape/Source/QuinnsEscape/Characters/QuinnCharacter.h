@@ -6,6 +6,8 @@
 #include "Characters/HealthCharacter.h"
 #include "QuinnCharacter.generated.h"
 
+
+
 /**
  * Quinn Character:
  * Main player character, Quinn
@@ -37,12 +39,15 @@ protected:
 	// Total cooldown in seconds in between firing each projectile
 	UPROPERTY(EditAnywhere)
 	float FireTotalCooldown;
-	UPROPERTY(EditAnywhere)
-	float SlamTotalCooldown;
-
 	// Speed that the projectile is fired at
 	UPROPERTY(EditAnywhere)
 	float ProjectileSpeed;
+	// Min and Max damage values to randomly select between when a projectile deals damage
+	UPROPERTY(EditAnywhere)
+	FVector2D ProjectileDamageMinMax;
+	// Total cooldown in seconds for the slam ability
+	UPROPERTY(EditAnywhere)
+	float SlamTotalCooldown;
 	// Amount of damage to deal to an enemy if the player lands on their head
 	UPROPERTY(EditAnywhere)
 	float HeadJumpDamage;

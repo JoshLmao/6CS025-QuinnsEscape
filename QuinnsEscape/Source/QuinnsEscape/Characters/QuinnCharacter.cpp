@@ -23,6 +23,7 @@ AQuinnCharacter::AQuinnCharacter()
 	ProjectileSpeed = 750.0f;
 	HeadJumpDamage = 25.0f;
 	SlamMultiplier = 1.35f;
+	ProjectileDamageMinMax = FVector2D(10, 25);
 
 	CurrentLives = 0;
 	StartLives = 3;
@@ -135,7 +136,7 @@ void AQuinnCharacter::MoveRight(float Value)
 
 bool AQuinnCharacter::OnCharacterDeath()
 {
-	bool isDead = Super::OnCharacterDeath();
+	bool isDead = false;
 
 	// Check if all lives have been used
 	if (CurrentLives > 0)
@@ -148,6 +149,9 @@ bool AQuinnCharacter::OnCharacterDeath()
 	if (isDead)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Quinn has no lives remaining"));
+		
+		// Call super on actual death
+		Super::OnCharacterDeath();
 	}
 	else
 	{
@@ -169,7 +173,6 @@ bool AQuinnCharacter::OnCharacterDeath()
 			// Needs changing to variable
 			SetActorLocation(FVector(0, 110, 230));
 		}
-		
 	}
 
 	return isDead;
@@ -221,6 +224,12 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 		projectile->SetLifeSpan(5.0f);
 		// Launch in direction
 		projectile->FireInDirection(direction);
+
+		// Randomly determine damage amount for projectile, remove decimals
+		float rndDmg = FMath::RandRange(ProjectileDamageMinMax.X, ProjectileDamageMinMax.Y);
+		rndDmg = FMath::FloorToInt(rndDmg);
+		// Set damage on projectile
+		projectile->SetDamage(rndDmg);
 
 		projectileActor->SetActorLocation(spawnLocation, false);
 	}

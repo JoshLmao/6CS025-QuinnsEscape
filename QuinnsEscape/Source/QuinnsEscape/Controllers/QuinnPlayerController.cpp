@@ -51,16 +51,23 @@ void AQuinnPlayerController::OnFireReleased()
 
 	// Ray trace from mouse position to the world
 	FHitResult result;
-	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, result);
-	// Lock the raycast X to character's X
-	result.Location.X = actorLoc.X;
+	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, false, result);
+	if (result.Location == FVector::ZeroVector)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to determine mouse click. No object traced under location"));
+	}
+	else
+	{
+		// Lock the raycast X to character's X
+		result.Location.X = actorLoc.X;
 
-	// Find look at from actors location to world position under mouse
-	FRotator lookAtRotator = UKismetMathLibrary::FindLookAtRotation(actorLoc, result.Location);
-	FVector fireDirectionVector = lookAtRotator.Vector();
+		// Find look at from actors location to world position under mouse
+		FRotator lookAtRotator = UKismetMathLibrary::FindLookAtRotation(actorLoc, result.Location);
+		FVector fireDirectionVector = lookAtRotator.Vector();
 
-	// Fire projectile towards to direction
-	QuinnCharacter->FireProjectile(fireDirectionVector);
+		// Fire projectile towards to direction
+		QuinnCharacter->FireProjectile(fireDirectionVector);
+	}
 }
 
 void AQuinnPlayerController::OnSlamReleased()

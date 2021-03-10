@@ -3,6 +3,9 @@
 
 #include "HealthCharacter.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AHealthCharacter::AHealthCharacter()
@@ -107,6 +110,39 @@ bool AHealthCharacter::TakeStomp(float damage)
 
 bool AHealthCharacter::OnCharacterDeath()
 {
+	// Ragdoll character on it's death
+	DetachFromControllerPendingDestroy();
+
+	// Disable any collision on main capsule
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	SetActorEnableCollision(true);
+	// Configure mesh to use ragdoll
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
+	
+	// Configure movement component to stop and prevent movement
+	if (UPawnMovementComponent* mc = GetMovementComponent())
+	{
+		mc->StopMovementImmediately();
+		mc->SetComponentTickEnabled(false);
+
+		// Cast to disable movement on character
+		if (UCharacterMovementComponent* cmc = Cast<UCharacterMovementComponent>(mc))
+		{
+			cmc->DisableMovement();
+		}
+	}
+
+	// Disappear character after delay
+	float timeoutSpan = 10.0f;
+	SetLifeSpan(timeoutSpan);
+
+	UE_LOG(LogTemp, Log, TEXT("Character '%s' has died. Lifespan of '%f' seconds"), *GetName(), timeoutSpan);
+
 	return true; // Kill character on death
 }
 
