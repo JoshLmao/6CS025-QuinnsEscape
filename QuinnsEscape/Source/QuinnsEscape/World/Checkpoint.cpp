@@ -6,10 +6,13 @@
 #include "Components/StaticMeshComponent.h"
 
 #include "../Characters/QuinnCharacter.h"
+#include "../Game/QuinnGameState.h"
 
 // Sets default values
 ACheckpoint::ACheckpoint()
 {
+	ScoreReward = 10;
+
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
@@ -79,17 +82,31 @@ void ACheckpoint::CheckpointBeginOverlap(UPrimitiveComponent* OverlappedComponen
 	// Check other actor is Quinn & hasn't already passed
 	if (OtherActor->IsA(AQuinnCharacter::StaticClass()) && !m_hasPassed)
 	{
-		// Set passed flag to only set this checkpoint once
-		m_hasPassed = true;
+		OnPlayerPassCheckpoint(OtherActor);
+	}
+}
 
-		// Cast actor to Quinn character and set this as latest checkpoint
-		AQuinnCharacter* quinn = Cast<AQuinnCharacter>(OtherActor);
-		if (IsValid(quinn))
-		{
-			quinn->SetCheckpoint(this);
-			UE_LOG(LogTemp, Log, TEXT("Player passed through '%s' checkpoint! Set as latest"), *GetName());
 
-			m_lerpAlpha = 0.0f;
-		}
+void ACheckpoint::OnPlayerPassCheckpoint(AActor* playerActor)
+{
+	// Set passed flag to only set this checkpoint once
+	m_hasPassed = true;
+
+	// Set model to lerp up up-right position
+	m_lerpAlpha = 0.0f;
+
+	// Cast actor to Quinn character and set this as latest checkpoint
+	AQuinnCharacter* quinn = Cast<AQuinnCharacter>(playerActor);
+	if (IsValid(quinn))
+	{
+		quinn->SetCheckpoint(this);
+		UE_LOG(LogTemp, Log, TEXT("Player passed through '%s' checkpoint! Set as latest checkpoint"), *GetName());
+	}
+
+	// Get game state and reward player
+	AGameStateBase* gameState = GetWorld()->GetGameState();
+	if (AQuinnGameState* state = Cast< AQuinnGameState>(gameState))
+	{
+		state->AddScore(ScoreReward);
 	}
 }

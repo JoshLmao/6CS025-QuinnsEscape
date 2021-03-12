@@ -22,6 +22,10 @@ public:
 	*	VARIABLES
 	*/
 public:
+	// Amount of score to reward the player with for passing the checkpoint
+	UPROPERTY(EditAnywhere, Category = "Checkpoint Details")
+	int ScoreReward;
+
 	// Box extent of the checkpoint trigger
 	UPROPERTY(EditAnywhere, Category = "Checkpoint Details")
 	FVector BoxExtent;
@@ -55,5 +59,7 @@ public:
 private:
 	UFUNCTION()
 	void CheckpointBeginOverlap(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void OnPlayerPassCheckpoint(AActor* player);
 
 };

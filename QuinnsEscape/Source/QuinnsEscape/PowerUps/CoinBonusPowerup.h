@@ -14,7 +14,28 @@ UCLASS()
 class QUINNSESCAPE_API ACoinBonusPowerup : public APowerupPickup
 {
 	GENERATED_BODY()
-	
+
+public:
+	// Default constructor
+	ACoinBonusPowerup();
+
+	/*
+	*	VARIABLES
+	*/
+public:
+	// Amount of score to initially give after picking up
+	UPROPERTY(EditAnywhere)
+	int InitialScore;
+	// Amount of multiplier to give after picking up
+	UPROPERTY(EditAnywhere)
+	float ScoreMultiplier;
+	// Duration in seconds to apply the multiplier
+	UPROPERTY(EditAnywhere)
+	float MultiplierDuration;
+
+	/*
+	*	METHODS
+	*/
 protected:
 	// Override apply effects
 	virtual void ApplyEffects(APawn* pawn);

@@ -60,5 +60,5 @@ void APowerupPickup::OnActorBeginOverlap(UPrimitiveComponent* OverlappedComponen
 
 void APowerupPickup::ApplyEffects(APawn* pawn)
 {
-
+	// Can be overrided. Applies the relevant effects of the pickup
 }
