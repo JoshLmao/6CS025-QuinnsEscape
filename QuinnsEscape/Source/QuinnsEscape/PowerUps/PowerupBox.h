@@ -43,6 +43,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComponent;
 
+	// Text component used to represent a character to show this box is breakable
+	UPROPERTY(EditAnywhere)
+	class ATextRenderActor* TextComponent;
+
 private:
 	// Current amount of spawned powerups
 	int m_spawnedPowerupCount;
@@ -72,5 +76,8 @@ private:
 
 	// Can this box spawn a powerup
 	bool CanSpawnPowerup();
+
+	// Creates the TextComponent to display text infront of box
+	void CreateTextComponent();
 
 };

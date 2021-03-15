@@ -96,6 +96,8 @@ public:
 
 	// Gets the current lives of Quinn
 	int GetCurrentLives();
+	// Adds an amount of lives to the current lives. CurrentLive's cannot supass the total lives
+	void AddLives(int amount);
 	// Gets the total lives of Quinn
 	int GetTotalLives();
 

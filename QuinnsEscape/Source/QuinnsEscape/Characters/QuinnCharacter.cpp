@@ -262,6 +262,16 @@ int AQuinnCharacter::GetCurrentLives()
 	return CurrentLives;
 }
 
+void AQuinnCharacter::AddLives(int amount)
+{
+	// Add lives amount
+	CurrentLives += amount;
+
+	// If current is more than total, set to total
+	if (CurrentLives > GetTotalLives())
+		CurrentLives = GetTotalLives();
+}
+
 int AQuinnCharacter::GetTotalLives()
 {
 	return StartLives;

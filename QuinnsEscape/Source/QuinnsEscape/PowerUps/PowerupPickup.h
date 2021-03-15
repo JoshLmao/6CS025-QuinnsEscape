@@ -45,8 +45,11 @@ protected:
 	virtual void BeginPlay() override;
 
 	// Apply the powerup effects to the collided pawn.
-	virtual void ApplyEffects(APawn* pawn);
+	virtual void ApplyEffects(APawn* collidedPawn);
 	 
+	// Gets the game state and casts it to AQuinnGameState
+	class AQuinnGameState* GetQuinnGameState();
+
 private:
 	// Called when BoxTrigger begins overlap
 	UFUNCTION()

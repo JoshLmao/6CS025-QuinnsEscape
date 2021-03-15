@@ -14,13 +14,12 @@ ACoinBonusPowerup::ACoinBonusPowerup()
 	MultiplierDuration = 20;
 }
 
-void ACoinBonusPowerup::ApplyEffects(APawn* pawn)
+void ACoinBonusPowerup::ApplyEffects(APawn* collidedPawn)
 {
-	Super::ApplyEffects(pawn);
+	Super::ApplyEffects(collidedPawn);
 
-	// Cast to quinn
-	AGameStateBase* baseState = GetWorld()->GetGameState();
-	if (AQuinnGameState* gameState = Cast<AQuinnGameState>(baseState))
+	// Get QuinnGameState
+	if (AQuinnGameState* gameState = this->GetQuinnGameState())
 	{
 		// Add score before multiplier
 		gameState->AddScore(InitialScore);

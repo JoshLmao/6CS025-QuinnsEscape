@@ -12,7 +12,6 @@ AQuinnsEscapeGameMode::AQuinnsEscapeGameMode()
 {
 	// Set default player controller to custom one
 	PlayerControllerClass = AQuinnPlayerController::StaticClass();
-	HUDClass = ALevel0HUD::StaticClass();
 	GameStateClass = AQuinnGameState::StaticClass();
 
 	// set default pawn class to our Blueprinted character
@@ -20,5 +19,12 @@ AQuinnsEscapeGameMode::AQuinnsEscapeGameMode()
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
+
+	// Set HUD class from Blueprint
+	static ConstructorHelpers::FClassFinder<AHUD> Level0HUDBPClass(TEXT("/Game/QuinnsEscape/UI/BP_Level0HUD"));
+	if (Level0HUDBPClass.Class != NULL)
+	{
+		HUDClass = Level0HUDBPClass.Class;
 	}
 }

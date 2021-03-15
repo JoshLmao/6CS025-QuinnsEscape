@@ -6,6 +6,8 @@
 #include "Engine/StaticMesh.h"
 #include "Components/BoxComponent.h"
 #include "../Characters/QuinnCharacter.h"
+#include "Engine/World.h"
+#include "../Game/QuinnGameState.h"
 
 // Sets default values
 APowerupPickup::APowerupPickup()
@@ -16,10 +18,11 @@ APowerupPickup::APowerupPickup()
 	// Create and set static mesh as root
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	RootComponent = StaticMeshComponent;
+	// No collision on powerup mesh representation
+	StaticMeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
+	// Set Mesh if set
 	if (IsValid(Mesh))
-	{
 		StaticMeshComponent->SetStaticMesh(Mesh);
-	}
 
 	// Create box trigger
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Trigger"));
@@ -51,14 +54,28 @@ void APowerupPickup::OnActorBeginOverlap(UPrimitiveComponent* OverlappedComponen
 		UE_LOG(LogTemp, Log, TEXT("Quinn overlapped with '%s'"), *this->GetName());
 
 		// Apply effects of powerup
-		ApplyEffects(Cast<APawn>(OtherActor));
+		APawn* pawn = Cast<APawn>(OtherActor);
+		ApplyEffects(pawn);
 
 		// Destroy pickup once complete
 		this->Destroy();
 	}
 }
 
-void APowerupPickup::ApplyEffects(APawn* pawn)
+void APowerupPickup::ApplyEffects(APawn* playerPawn)
 {
 	// Can be overrided. Applies the relevant effects of the pickup
+}
+
+AQuinnGameState* APowerupPickup::GetQuinnGameState()
+{
+	// Get base state and cast
+	AGameStateBase* baseState = GetWorld()->GetGameState();
+	if (AQuinnGameState* gameState = Cast<AQuinnGameState>(baseState))
+	{
+		// Return cast if successful
+		return gameState;
+	}
+	// Return nullptr since we couldnt cast
+	return nullptr;
 }

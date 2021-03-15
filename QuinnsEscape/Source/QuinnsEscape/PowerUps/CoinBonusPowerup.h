@@ -38,5 +38,5 @@ public:
 	*/
 protected:
 	// Override apply effects
-	virtual void ApplyEffects(APawn* pawn);
+	virtual void ApplyEffects(APawn* collidedPawn) override;
 };
