@@ -7,7 +7,8 @@
 #include "ExtraLifePowerup.generated.h"
 
 /**
- * 
+ *	Gives the player an extra live if one is missing, or rewards the player
+ *	with an amount of bonus score if full
  */
 UCLASS()
 class QUINNSESCAPE_API AExtraLifePowerup : public APowerupPickup

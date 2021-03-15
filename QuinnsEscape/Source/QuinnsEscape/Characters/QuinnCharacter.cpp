@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "DrawDebugHelpers.h"
+#include "TimerManager.h"
 
 #include "../Projectiles/ProjectileBase.h"
 #include "../World/Checkpoint.h"
@@ -128,6 +129,18 @@ void AQuinnCharacter::Jump()
 	Super::Jump();
 }
 
+float AQuinnCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (this->GetIsInvulnerable())
+	{
+		return 0;
+	}
+	
+	return damage;
+}
+
 void AQuinnCharacter::MoveRight(float Value)
 {
 	// add movement in that direction
@@ -173,6 +186,9 @@ bool AQuinnCharacter::OnCharacterDeath()
 			// Needs changing to variable
 			SetActorLocation(FVector(0, 110, 230));
 		}
+
+		// Clear any effects character has from power-ups
+		ClearCharacterEffects();
 	}
 
 	return isDead;
@@ -287,6 +303,16 @@ void AQuinnCharacter::SetCheckpoint(ACheckpoint* checkpoint)
 	LastCheckpoint = checkpoint;
 }
 
+void AQuinnCharacter::SetIsInvulnerable(bool isInvulnerable)
+{
+	m_isInvulnerable = isInvulnerable;
+}
+
+bool AQuinnCharacter::GetIsInvulnerable()
+{
+	return m_isInvulnerable;
+}
+
 void AQuinnCharacter::OnStompCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	/*
@@ -325,5 +351,41 @@ void AQuinnCharacter::OnStompCapsuleBeginOverlap(UPrimitiveComponent* Overlapped
 				m_hasAppliedDmgThisJump = true;
 			}
 		}
+	}
+}
+
+void AQuinnCharacter::SetIsInvulnerableForDuration(int duration)
+{
+	// Check timer isnt active
+	if (!GetWorldTimerManager().IsTimerActive(m_invulnerabilityTimerHandle))
+	{
+		// Set character to invulnerable
+		this->SetIsInvulnerable(true);
+
+		// Start timer for duration
+		GetWorldTimerManager().SetTimer(m_invulnerabilityTimerHandle, this, &AQuinnCharacter::OnInvulnerabilityDurationExpired, duration);
+		UE_LOG(LogTemp, Log, TEXT("Quinn has started invulnerability for '%d' seconds!"), duration);
+	}
+}
+
+void AQuinnCharacter::OnInvulnerabilityDurationExpired()
+{
+	// Disable invulnerability after duration
+	UE_LOG(LogTemp, Log, TEXT("Quinn invulnerability expired"));
+	this->SetIsInvulnerable(false);
+}
+
+void AQuinnCharacter::ClearCharacterEffects()
+{
+	// Check if invulnerability timer is active and clear it
+	if (GetWorldTimerManager().IsTimerActive(m_invulnerabilityTimerHandle))
+	{
+		GetWorldTimerManager().ClearTimer(m_invulnerabilityTimerHandle);
+	}
+
+	// Disable invulnerability if active
+	if (this->GetIsInvulnerable())
+	{
+		this->SetIsInvulnerable(false);
 	}
 }

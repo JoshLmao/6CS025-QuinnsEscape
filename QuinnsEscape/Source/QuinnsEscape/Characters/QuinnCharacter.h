@@ -79,6 +79,10 @@ private:
 	bool m_isSlamingGround;
 	// Has any damage been applied during this jump
 	bool m_hasAppliedDmgThisJump;
+	// Is the character currently unable to take damage?
+	bool m_isInvulnerable;
+	// Timer handler for invulernability for a duration
+	FTimerHandle m_invulnerabilityTimerHandle;
 
 	/*
 	*	METHODS
@@ -101,8 +105,18 @@ public:
 	// Gets the total lives of Quinn
 	int GetTotalLives();
 
+	// Gets the last checkpoint that Quinn passed through
 	class ACheckpoint* GetLastCheckpoint();
+	// Sets the last active checkpoint the character passed through
 	void SetCheckpoint(class ACheckpoint* checkpoint);
+
+	// Set if the character can take damage or not (invulnerability)
+	void SetIsInvulnerable(bool isInvulnerable);
+	// Get if the character can take damage or not (invulnerability)
+	bool GetIsInvulnerable();
+	// Sets invulnerability to true for a duration
+	void SetIsInvulnerableForDuration(int duration);
+
 
 protected:
 	// BeginPlay function called on Actor begin
@@ -113,14 +127,24 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	// Jump function to force character in air
 	virtual void Jump() override;
+	// Called when character takes damage
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	// Called when the character dies, runs out of health
 	virtual bool OnCharacterDeath() override;
 
 	// Called for side to side input
 	void MoveRight(float Val);
 
 private:
+	// Callback function for the StompSphereComponent OnComponentBeginOverlap
 	UFUNCTION()
 	void OnStompCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	// Invulnerability callback function once timer has finished
+	UFUNCTION()
+	void OnInvulnerabilityDurationExpired();
+
+	// Clears any effects, such as bonuses or debuffs, currently applied to the character
+	void ClearCharacterEffects();
 };
