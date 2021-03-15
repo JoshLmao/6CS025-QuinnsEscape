@@ -25,6 +25,8 @@ AQuinnCharacter::AQuinnCharacter()
 	HeadJumpDamage = 25.0f;
 	SlamMultiplier = 1.35f;
 	ProjectileDamageMinMax = FVector2D(10, 25);
+	m_currentDmgMultiplier = 1.0f;
+	m_isInvulnerable = false;
 
 	CurrentLives = 0;
 	StartLives = 3;
@@ -244,6 +246,10 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 		// Randomly determine damage amount for projectile, remove decimals
 		float rndDmg = FMath::RandRange(ProjectileDamageMinMax.X, ProjectileDamageMinMax.Y);
 		rndDmg = FMath::FloorToInt(rndDmg);
+		
+		// Multiply damage by multiplier
+		rndDmg *= this->GetDamageMultiplier();
+
 		// Set damage on projectile
 		projectile->SetDamage(rndDmg);
 
@@ -343,6 +349,9 @@ void AQuinnCharacter::OnStompCapsuleBeginOverlap(UPrimitiveComponent* Overlapped
 				m_isSlamingGround = false;
 			}
 
+			// Multiply damage by multiplier
+			dmg *= this->GetDamageMultiplier();
+
 			// Deal stomp damage to the character
 			bool dealtDmg = healthChar->TakeStomp(dmg);
 			if (dealtDmg)
@@ -368,11 +377,47 @@ void AQuinnCharacter::SetIsInvulnerableForDuration(int duration)
 	}
 }
 
+void AQuinnCharacter::SetDamageMultiplierForDuration(float multiplier, int duration)
+{
+	if (!GetWorldTimerManager().IsTimerActive(m_dmgMultiplierTimerHandle))
+	{
+		this->SetDamageMultiplier(multiplier);
+
+		GetWorldTimerManager().SetTimer(m_dmgMultiplierTimerHandle, this, &AQuinnCharacter::OnDmgMultiplierDurationExpired, duration);
+		UE_LOG(LogTemp, Log, TEXT("Set Dmg Multiplier to '%f' for '%d' seconds"), multiplier, duration);
+	}
+}
+
+float AQuinnCharacter::GetDamageMultiplier()
+{
+	return m_currentDmgMultiplier;
+}
+
+void AQuinnCharacter::SetDamageMultiplier(float multiplier)
+{
+	// Dont let multiplier be less than 0.5x
+	if (multiplier <= 0.5f)
+	{
+		m_currentDmgMultiplier = 0.5f;
+	}
+	else
+	{
+		// Set the given multiplier
+		m_currentDmgMultiplier = multiplier;
+	}
+}
+
 void AQuinnCharacter::OnInvulnerabilityDurationExpired()
 {
 	// Disable invulnerability after duration
 	UE_LOG(LogTemp, Log, TEXT("Quinn invulnerability expired"));
 	this->SetIsInvulnerable(false);
+}
+
+void AQuinnCharacter::OnDmgMultiplierDurationExpired()
+{
+	UE_LOG(LogTemp, Log, TEXT("Finished dmg multiplier. Set mutliplier to 1.0f"));
+	this->SetDamageMultiplier(1.0f);
 }
 
 void AQuinnCharacter::ClearCharacterEffects()

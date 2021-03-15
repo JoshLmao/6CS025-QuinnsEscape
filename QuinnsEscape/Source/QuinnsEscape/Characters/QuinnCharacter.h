@@ -79,10 +79,16 @@ private:
 	bool m_isSlamingGround;
 	// Has any damage been applied during this jump
 	bool m_hasAppliedDmgThisJump;
+	
 	// Is the character currently unable to take damage?
 	bool m_isInvulnerable;
 	// Timer handler for invulernability for a duration
 	FTimerHandle m_invulnerabilityTimerHandle;
+
+	// Multiplier amount to times any damage dealt by this character
+	float m_currentDmgMultiplier;
+	// Timer handler for a dmg multiplier for a duration
+	FTimerHandle m_dmgMultiplierTimerHandle;
 
 	/*
 	*	METHODS
@@ -117,6 +123,12 @@ public:
 	// Sets invulnerability to true for a duration
 	void SetIsInvulnerableForDuration(int duration);
 
+	// Sets the damage multiplier to the given multiplier for duration of seconds
+	void SetDamageMultiplierForDuration(float multiplier, int duration);
+	// Gets the current damage multiplier on the character
+	float GetDamageMultiplier();
+	// Set the current damage multiplier
+	void SetDamageMultiplier(float multiplier);
 
 protected:
 	// BeginPlay function called on Actor begin
@@ -144,6 +156,10 @@ private:
 	// Invulnerability callback function once timer has finished
 	UFUNCTION()
 	void OnInvulnerabilityDurationExpired();
+
+	// Damage Multiplier callback function once timer has finished
+	UFUNCTION()
+	void OnDmgMultiplierDurationExpired();
 
 	// Clears any effects, such as bonuses or debuffs, currently applied to the character
 	void ClearCharacterEffects();
