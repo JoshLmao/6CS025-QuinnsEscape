@@ -25,6 +25,18 @@ public:
 	// Mesh to set on the static mesh component
 	class UStaticMesh* Mesh;
 
+	// Speed at which the powerup is rotated, spinning round
+	UPROPERTY(EditAnywhere, Category = "Spin Animation")
+	float RotationSpeed;
+
+	// Speed at which to float up and down
+	UPROPERTY(EditAnywhere, Category = "Spin Animation")
+	float FloatSpeed;
+
+	// Amount of movement that happens on the Z axis on the spin/float animation
+	UPROPERTY(EditAnywhere, Category = "Spin Animation")
+	float ZMoveAmount;
+
 protected:
 	// Root mesh component for visual
 	UPROPERTY(EditAnywhere)
@@ -32,6 +44,11 @@ protected:
 	// Box component to detect overlap with characters
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxTrigger;
+
+private:
+	bool m_animGoUp;
+	float m_minZ;
+	float m_maxZ;
 	
 	/*
 	*	METHODS
@@ -54,4 +71,7 @@ private:
 	// Called when BoxTrigger begins overlap
 	UFUNCTION()
 	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	// Performs spin animation code
+	void DoSpinAnimation(float deltaTime);
 };
