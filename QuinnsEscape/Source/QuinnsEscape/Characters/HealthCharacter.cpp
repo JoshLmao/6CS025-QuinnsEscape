@@ -6,10 +6,14 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "../Game/QuinnGameState.h"
 
 // Sets default values
 AHealthCharacter::AHealthCharacter()
 {
+	HitScore = 0.5;
+	KilledScore = 5;
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -91,6 +95,14 @@ void AHealthCharacter::DealDamage(float damage)
 			{
 				OnCharacterDied.Broadcast();
 			}
+
+			// Reward with killed score
+			AGameStateBase* state = GetWorld()->GetGameState();
+			if (IsValid(state))
+			{
+				AQuinnGameState* quinnState = Cast<AQuinnGameState>(state);
+				quinnState->AddScore(this->GetKilledScoreReward());
+			}
 		}
 	}
 }
@@ -144,6 +156,26 @@ bool AHealthCharacter::OnCharacterDeath()
 	UE_LOG(LogTemp, Log, TEXT("Character '%s' has died. Lifespan of '%f' seconds"), *GetName(), timeoutSpan);
 
 	return true; // Kill character on death
+}
+
+double AHealthCharacter::GetHitScoreReward()
+{
+	return HitScore;
+}
+
+void AHealthCharacter::SetHitScoreReward(double score)
+{
+	HitScore = score;
+}
+
+double AHealthCharacter::GetKilledScoreReward()
+{
+	return KilledScore;
+}
+
+void AHealthCharacter::SetKilledScoreReward(double score)
+{
+	KilledScore = score;
 }
 
 float AHealthCharacter::GetCurrentHealth()

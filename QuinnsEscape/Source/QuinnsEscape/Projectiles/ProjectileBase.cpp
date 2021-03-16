@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "../Characters/HealthCharacter.h"
+#include "../Game/QuinnGameState.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -104,11 +105,19 @@ void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComp
 	// Check other actor is an actor that contains health
 	if (OtherActor->IsA(AHealthCharacter::StaticClass()))
 	{
-		AHealthCharacter* cast = Cast<AHealthCharacter>(OtherActor);
+		AHealthCharacter* healthCharacter = Cast<AHealthCharacter>(OtherActor);
 		// Actor is a HealthCharacter
-		OtherActor->TakeDamage(GetDamage(), FDamageEvent(), nullptr, this);
+		healthCharacter->TakeDamage(GetDamage(), FDamageEvent(), nullptr, this);
 
-		UE_LOG(LogTemp, Log, TEXT("Projectile '%s' collided with Character '%s' and dealth '%f' damage (%f/%f)"), *this->GetName(), *OtherActor->GetName(), GetDamage(), cast->GetCurrentHealth(), cast->GetTotalHealth());
+		UE_LOG(LogTemp, Log, TEXT("Projectile '%s' collided with Character '%s' and dealth '%f' damage (%f/%f)"), *this->GetName(), *healthCharacter->GetName(), GetDamage(), healthCharacter->GetCurrentHealth(), healthCharacter->GetTotalHealth());
+
+		// Get game state and add score reward
+		AGameStateBase* baseState = GetWorld()->GetGameState();
+		if (IsValid(baseState))
+		{
+			AQuinnGameState* quinnState = Cast<AQuinnGameState>(baseState);
+			quinnState->AddScore(healthCharacter->GetHitScoreReward());
+		}
 
 		// Destroy projectile as it's collided with another actor
 		this->Destroy();

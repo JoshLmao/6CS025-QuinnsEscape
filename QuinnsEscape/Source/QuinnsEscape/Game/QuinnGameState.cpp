@@ -4,12 +4,19 @@
 #include "QuinnGameState.h"
 #include "TimerManager.h"
 
-int AQuinnGameState::GetScore()
+AQuinnGameState::AQuinnGameState()
+{
+	// Set default variables
+	m_totalScore = 0.0;
+	m_currentScoreMultiplier = 1;
+}
+
+double AQuinnGameState::GetScore()
 {
 	return m_totalScore;
 }
 
-void AQuinnGameState::AddScore(int amount)
+void AQuinnGameState::AddScore(double amount)
 {
 	// Add amount of score to total
 	m_totalScore += (amount * m_currentScoreMultiplier);
@@ -39,4 +46,9 @@ void AQuinnGameState::OnDurationScoreMultiplierEnded()
 	m_currentScoreMultiplier = 1;
 
 	UE_LOG(LogTemp, Log, TEXT("Set score multiplier back to '%f'"), m_currentScoreMultiplier);
+}
+
+float AQuinnGameState::GetScoreMultiplier()
+{
+	return m_currentScoreMultiplier;
 }

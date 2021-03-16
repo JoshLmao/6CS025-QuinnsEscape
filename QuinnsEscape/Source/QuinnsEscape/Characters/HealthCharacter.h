@@ -44,6 +44,14 @@ public:
 	/*
 	*	VARIABLES
 	*/
+public:
+	// Amount of score to reward when character gets hit with a regular attack
+	UPROPERTY(EditAnywhere, Category = "Scoring")
+	double HitScore;
+	// Amount of score to reward when this character dies
+	UPROPERTY(EditAnywhere, Category = "Scoring")
+	double KilledScore;
+
 private:
 	// Current health of the character
 	float m_currentHealth;
@@ -62,6 +70,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FHealthCharDeathSignature OnCharacterDied;
 
+	// Gets the amount of score to reward to the other character for a regular hit to this character
+	double GetHitScoreReward();
+	// Sets the amount of score to reward the other character with when hit with a regular attack
+	void SetHitScoreReward(double score);
+	// Gets the amount of score to reward when this character dies
+	double GetKilledScoreReward();
+	// Sets the amount of score to reward when this character dies
+	void SetKilledScoreReward(double score);
 
 	/*
 	*	METHODS

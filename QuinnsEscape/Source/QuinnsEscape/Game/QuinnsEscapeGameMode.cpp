@@ -20,11 +20,19 @@ AQuinnsEscapeGameMode::AQuinnsEscapeGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to determine DefaultPawnClass! PlayerPawn path is incorrect"));
+	}
 
 	// Set HUD class from Blueprint
-	static ConstructorHelpers::FClassFinder<AHUD> Level0HUDBPClass(TEXT("/Game/QuinnsEscape/UI/BP_Level0HUD"));
+	static ConstructorHelpers::FClassFinder<AHUD> Level0HUDBPClass(TEXT("/Game/QuinnsEscape/Blueprints/BP_Level0HUD"));
 	if (Level0HUDBPClass.Class != NULL)
 	{
 		HUDClass = Level0HUDBPClass.Class;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to determine HUDClass! Level0HUDBPClass path is incorrect"));
 	}
 }

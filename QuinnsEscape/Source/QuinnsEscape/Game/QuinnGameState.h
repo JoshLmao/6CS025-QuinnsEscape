@@ -13,10 +13,16 @@ UCLASS()
 class QUINNSESCAPE_API AQuinnGameState : public AGameStateBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	AQuinnGameState();
+
+	/*
+	*	VARIABLES
+	*/
 private:
 	// Total score of this play session
-	int m_totalScore;
+	double m_totalScore;
 	// Current multiplier to apply when adding any new score
 	float m_currentScoreMultiplier;
 
@@ -28,10 +34,12 @@ private:
 	*/
 public:
 	// Gets the current score
-	int GetScore();
+	double GetScore();
 	// Adds an amount to the current score
-	void AddScore(int amount);
+	void AddScore(double amount);
 
+	// Gets the current score multiplier
+	float GetScoreMultiplier();
 	// Sets a duration multiplier for the score for a duration
 	void SetDurationScoreMultiplier(float multiplier, float durationSeconds);
 
