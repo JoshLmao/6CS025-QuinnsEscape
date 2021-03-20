@@ -32,6 +32,10 @@ protected:
 	// Slam action button is released
 	void OnSlamReleased();
 
+	void OnAxisMoveRight(float value);
+	void OnActionJump();
+	void OnActionStopJumping();
+
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void OnUnPossess() override;
 };

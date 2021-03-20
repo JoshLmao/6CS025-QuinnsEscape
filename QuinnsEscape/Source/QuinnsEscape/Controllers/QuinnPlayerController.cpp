@@ -29,6 +29,12 @@ void AQuinnPlayerController::SetupInputComponent()
 	// Input Actions
 	InputComponent->BindAction("Fire", IE_Released, this, &AQuinnPlayerController::OnFireReleased);
 	InputComponent->BindAction("Slam", IE_Released, this, &AQuinnPlayerController::OnSlamReleased);
+	// Bind pressed and released of "Jump"
+	InputComponent->BindAction("Jump", IE_Pressed, this, &AQuinnPlayerController::OnActionJump);
+	InputComponent->BindAction("Jump", IE_Released, this, &AQuinnPlayerController::OnActionStopJumping);
+
+	// Axis actions
+	InputComponent->BindAxis("MoveRight", this, &AQuinnPlayerController::OnAxisMoveRight);
 }
 
 void AQuinnPlayerController::OnPossess(APawn* aPawn)
@@ -47,6 +53,11 @@ void AQuinnPlayerController::OnUnPossess()
 
 void AQuinnPlayerController::OnFireReleased()
 {
+	if (IsLookInputIgnored())
+	{
+		return;
+	}
+
 	FVector actorLoc = GetPawn()->GetActorLocation();
 
 	// Ray trace from mouse position to the world
@@ -73,4 +84,37 @@ void AQuinnPlayerController::OnFireReleased()
 void AQuinnPlayerController::OnSlamReleased()
 {
 	QuinnCharacter->SlamGround();
+}
+
+void AQuinnPlayerController::OnAxisMoveRight(float value)
+{
+	// Check if move input should be ignored first
+	if (IsMoveInputIgnored())
+	{
+		return;
+	}
+
+	QuinnCharacter->MoveRight(value);
+}
+
+void AQuinnPlayerController::OnActionJump()
+{
+	// Check if move input should be ignored first
+	if (IsMoveInputIgnored())
+	{
+		return;
+	}
+
+	QuinnCharacter->Jump();
+}
+
+void AQuinnPlayerController::OnActionStopJumping()
+{
+	// Check if move input should be ignored first
+	if (IsMoveInputIgnored())
+	{
+		return;
+	}
+
+	QuinnCharacter->StopJumping();
 }

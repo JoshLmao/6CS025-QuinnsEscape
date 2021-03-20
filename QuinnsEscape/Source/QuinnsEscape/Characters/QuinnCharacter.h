@@ -130,6 +130,14 @@ public:
 	// Set the current damage multiplier
 	void SetDamageMultiplier(float multiplier);
 
+	// Called for side to side input
+	void MoveRight(float Val);
+
+	// Jump function to force character in air
+	virtual void Jump() override;
+	// Stop jumping function
+	virtual void StopJumping() override;
+
 protected:
 	// BeginPlay function called on Actor begin
 	virtual void BeginPlay() override;
@@ -137,16 +145,12 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// Tick function called every frame
 	virtual void Tick(float DeltaTime) override;
-	// Jump function to force character in air
-	virtual void Jump() override;
+
 	// Called when character takes damage
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	// Called when the character dies, runs out of health
 	virtual bool OnCharacterDeath() override;
-
-	// Called for side to side input
-	void MoveRight(float Val);
 
 private:
 	// Callback function for the StompSphereComponent OnComponentBeginOverlap

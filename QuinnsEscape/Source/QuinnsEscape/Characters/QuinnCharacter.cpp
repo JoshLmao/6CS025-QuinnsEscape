@@ -85,13 +85,6 @@ AQuinnCharacter::AQuinnCharacter()
 void AQuinnCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// set up gameplay key bindings
-	// Actions
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AQuinnCharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AQuinnCharacter::FireProjectile);
-
-	// Axis
-	PlayerInputComponent->BindAxis("MoveRight", this, &AQuinnCharacter::MoveRight);
 }
 
 void AQuinnCharacter::BeginPlay()
@@ -129,6 +122,11 @@ void AQuinnCharacter::Jump()
 	m_hasAppliedDmgThisJump = m_isSlamingGround = false;
 
 	Super::Jump();
+}
+
+void AQuinnCharacter::StopJumping()
+{
+	Super::StopJumping();
 }
 
 float AQuinnCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
