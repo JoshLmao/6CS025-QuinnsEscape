@@ -27,7 +27,9 @@ void AQuinnPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	// Input Actions
+	// Fire
 	InputComponent->BindAction("Fire", IE_Released, this, &AQuinnPlayerController::OnFireReleased);
+	// Slam
 	InputComponent->BindAction("Slam", IE_Released, this, &AQuinnPlayerController::OnSlamReleased);
 	// Bind pressed and released of "Jump"
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AQuinnPlayerController::OnActionJump);

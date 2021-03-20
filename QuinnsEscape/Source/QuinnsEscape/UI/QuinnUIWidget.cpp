@@ -26,6 +26,10 @@ void UQuinnUIWidget::NativeConstruct()
 	}
 }
 
+AQuinnCharacter* UQuinnUIWidget::GetQuinnCharacter()
+{
+	return m_quinn;
+}
 
 float UQuinnUIWidget::GetCurrentHealth()
 {

@@ -12,6 +12,7 @@ ADeadzoneCamera::ADeadzoneCamera()
 	YDeadzone = 500;
 	ZDeadzone = 200;
 	CameraFieldOfView = 80.0f;
+	m_camY = m_camZ = 0;
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -48,11 +49,11 @@ void ADeadzoneCamera::Tick(float DeltaTime)
 		// Get Y and Z values
 		m_camY = GetCameraY();
 		m_camZ = GetCameraZ();
-
-		// Update actor's position to target location
-		FVector loc = FVector(XOffset, m_camY, m_camZ + ZOffset);
-		SetActorLocation(loc);
 	}
+
+	// Update actor's position to target location
+	FVector loc = FVector(XOffset, m_camY, m_camZ + ZOffset);
+	SetActorLocation(loc);
 }
 
 float ADeadzoneCamera::GetCameraY()

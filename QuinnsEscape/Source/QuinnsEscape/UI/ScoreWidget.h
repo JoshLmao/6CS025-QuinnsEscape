@@ -27,10 +27,15 @@ protected:
 	// Called when Widget gets constructed
 	virtual void NativeConstruct() override;
 
+	// Gets the current game state in the world, cast to AQuinnGameState
+	UFUNCTION(BlueprintCallable)
+	class AQuinnGameState* GetQuinnGameState();
+
 	// Gets the current score
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentScore();
 	// Gets the current multiplier
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentScoreMultiplier();
+
 };

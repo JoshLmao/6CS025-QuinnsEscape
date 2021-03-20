@@ -5,6 +5,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Controllers/QuinnPlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 #include "UI/Level0HUD.h"
 #include "Game/QuinnGameState.h"
@@ -51,7 +52,7 @@ void AQuinnsEscapeGameMode::StartPlay()
 	TryBindLevelFailedEvent();
 }
 
-void AQuinnsEscapeGameMode::OnLevelComplete(AActor* endingTrigger, ACharacter* quinnChar)
+void AQuinnsEscapeGameMode::OnGameOver(bool didCompleteLevel)
 {
 	if (m_isLevelOver)
 	{
@@ -59,7 +60,6 @@ void AQuinnsEscapeGameMode::OnLevelComplete(AActor* endingTrigger, ACharacter* q
 	}
 
 	m_isLevelOver = true;
-	UE_LOG(LogTemp, Log, TEXT("Level ended through trigger '%s' by '%s'"), *endingTrigger->GetName(), *quinnChar->GetName());
 
 	// Get player controller and get HUD from PC.
 	APlayerController* pc = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -69,31 +69,35 @@ void AQuinnsEscapeGameMode::OnLevelComplete(AActor* endingTrigger, ACharacter* q
 		// Set state to level complete
 		if (ALevel0HUD* lvlHUD = Cast<ALevel0HUD>(hud))
 		{
-			lvlHUD->SetHUDDisplayState(EHUDState::LevelComplete);
+			lvlHUD->SetHUDDisplayState(didCompleteLevel ? EHUDState::LevelComplete : EHUDState::LevelFailed);
 		}
 
 		// Display input for player
 		pc->SetIgnoreMoveInput(true);
 		pc->SetIgnoreLookInput(true);
 	}
+
+	if (didCompleteLevel)
+	{
+		AGameStateBase* state = GetWorld()->GetGameState();
+		if (AQuinnGameState* quinnState = Cast<AQuinnGameState>(state))
+		{
+			double completeRewardScore = 100;
+			quinnState->AddScore(completeRewardScore);
+		}
+	}
+}
+
+void AQuinnsEscapeGameMode::OnLevelComplete(AActor* endingTrigger, ACharacter* quinnChar)
+{
+	OnGameOver(true);
+	UE_LOG(LogTemp, Log, TEXT("Level ended through trigger '%s' by '%s'"), *endingTrigger->GetName(), *quinnChar->GetName());
 }
 
 void AQuinnsEscapeGameMode::OnQuinnDeath()
 {
-	m_isLevelOver = true;
+	OnGameOver(false);
 	UE_LOG(LogTemp, Log, TEXT("Level ended through player death"));
-
-	// Get player controller and get HUD from PC.
-	APlayerController* pc = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (IsValid(pc))
-	{
-		AHUD* hud = pc->GetHUD();
-		// Set state to level failed
-		if (ALevel0HUD* lvlHUD = Cast<ALevel0HUD>(hud))
-		{
-			lvlHUD->SetHUDDisplayState(EHUDState::LevelFailed);
-		}
-	}
 }
 
 bool AQuinnsEscapeGameMode::TryBindLevelCompleteEvent()

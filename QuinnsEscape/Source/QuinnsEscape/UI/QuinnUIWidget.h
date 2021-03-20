@@ -7,7 +7,7 @@
 #include "QuinnUIWidget.generated.h"
 
 /**
- * 
+ *	Widget for interfacing with the AQuinnCharacter that exists in the scene.
  */
 UCLASS()
 class QUINNSESCAPE_API UQuinnUIWidget : public UUserWidget
@@ -25,6 +25,10 @@ private:
 	*	METHODS
 	*/
 protected:
+	// Gets the Quinn character
+	UFUNCTION(BlueprintCallable, Category = "Quinn")
+	virtual class AQuinnCharacter* GetQuinnCharacter();
+
 	// Gets the current health
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
 	virtual float GetCurrentHealth();

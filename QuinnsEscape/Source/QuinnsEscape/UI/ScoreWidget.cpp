@@ -19,6 +19,11 @@ void UScoreWidget::NativeConstruct()
 	}
 }
 
+AQuinnGameState* UScoreWidget::GetQuinnGameState()
+{
+	return QuinnGameState;
+}
+
 float UScoreWidget::GetCurrentScore()
 {
 	if (IsValid(QuinnGameState))
