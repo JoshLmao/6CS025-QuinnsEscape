@@ -43,6 +43,10 @@ public:
 	// Sets a duration multiplier for the score for a duration
 	void SetDurationScoreMultiplier(float multiplier, float durationSeconds);
 
+protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float deltaTime) override;
+
 private:
 	// Called when duration score multiplier is over
 	void OnDurationScoreMultiplierEnded();

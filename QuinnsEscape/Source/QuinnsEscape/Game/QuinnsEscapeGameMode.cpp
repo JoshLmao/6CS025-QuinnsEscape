@@ -75,15 +75,28 @@ void AQuinnsEscapeGameMode::OnGameOver(bool didCompleteLevel)
 		// Display input for player
 		pc->SetIgnoreMoveInput(true);
 		pc->SetIgnoreLookInput(true);
-	}
 
-	if (didCompleteLevel)
-	{
-		AGameStateBase* state = GetWorld()->GetGameState();
-		if (AQuinnGameState* quinnState = Cast<AQuinnGameState>(state))
+		// Cast controller char to Quinn
+		AQuinnCharacter* quinn = Cast<AQuinnCharacter>(pc->GetCharacter());
+		if (didCompleteLevel)
 		{
-			double completeRewardScore = 100;
-			quinnState->AddScore(completeRewardScore);
+			AGameStateBase* state = GetWorld()->GetGameState();
+			if (AQuinnGameState* quinnState = Cast<AQuinnGameState>(state))
+			{
+				double completeRewardScore = 50;
+				float averageCompletionSeconds = 60;	// 1 min
+				// Determine level complete multiplier
+				float completeMultiplier = averageCompletionSeconds / quinn->GetCharacterAliveDuration();
+				// Use Log2 to get multiplier
+				/*	Add determined value to 2 as to always give a positive multiplier
+					Log2(2) = 1, Log2(3) = 1.5, Log2(4) = 2, etc
+				*/
+				completeMultiplier = 2 + FMath::FloorLog2(completeMultiplier);
+				// Multiply complete score by bonus multiplier
+				double totalRewardScore = completeRewardScore * completeMultiplier;
+				// Add multiplied score to total
+				quinnState->AddScore(totalRewardScore);
+			}
 		}
 	}
 }

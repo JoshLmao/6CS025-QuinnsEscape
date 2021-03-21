@@ -47,10 +47,13 @@ protected:
 
 private:
 	// Current list of created UI widgets that are constantly active on screen
+	UPROPERTY()
 	TArray<class UUserWidget*> m_createdGameplayWidgets;
 	// Current list of created UI widgets for level complete
+	UPROPERTY()
 	TArray<class UUserWidget*> m_createdLvlCompleteWidgets;
 	// List of created UI widgets for level failed
+	UPROPERTY()
 	TArray<class UUserWidget*> m_createdLvlFailedWidgets;
 
 	/*

@@ -13,6 +13,7 @@ AHealthCharacter::AHealthCharacter()
 {
 	HitScore = 0.5;
 	KilledScore = 5;
+	m_aliveTimeSecs = 0;
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -41,6 +42,11 @@ void AHealthCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Increment alive time if character is alive
+	if (this->GetIsCharacterAlive())
+	{
+		m_aliveTimeSecs += DeltaTime;
+	}
 }
 
 // Called to bind functionality to input
@@ -215,4 +221,14 @@ bool AHealthCharacter::GetDestroyOnFall()
 void AHealthCharacter::SetDestroyOnFall(bool shouldDestroy)
 {
 	m_shouldDestroyOnFall = shouldDestroy;
+}
+
+bool AHealthCharacter::GetIsCharacterAlive()
+{
+	return this->GetCurrentHealth() > 0;
+}
+
+float AHealthCharacter::GetCharacterAliveDuration()
+{
+	return m_aliveTimeSecs;
 }

@@ -40,6 +40,16 @@ void AQuinnGameState::SetDurationScoreMultiplier(float multiplier, float duratio
 	UE_LOG(LogTemp, Log, TEXT("Set score multiplier to '%f', for '%f' seconds"), m_currentScoreMultiplier, durationSeconds);
 }
 
+void AQuinnGameState::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AQuinnGameState::Tick(float deltaTime)
+{
+	Super::Tick(deltaTime);
+}
+
 void AQuinnGameState::OnDurationScoreMultiplierEnded()
 {
 	// Set multiplier back to 1

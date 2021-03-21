@@ -61,6 +61,8 @@ private:
 	bool m_canRecieveStomp;
 	// Should the character be destroyed when falling out of world
 	bool m_shouldDestroyOnFall;
+	// Time in seconds the character has been alive for
+	float m_aliveTimeSecs;
 
 	/*
 	*	EVENTS
@@ -95,6 +97,12 @@ public:
 	bool GetDestroyOnFall();
 	// Set if the character should be destroyed when falling out of level
 	void SetDestroyOnFall(bool shouldDestroy);
+
+	// Gets if the current health character is alive or dead
+	bool GetIsCharacterAlive();
+
+	// Gets the duration in seconds the character has been alive
+	float GetCharacterAliveDuration();
 
 	// Can this character recieve being jumped on the head of
 	bool CanRecieveStomp();
