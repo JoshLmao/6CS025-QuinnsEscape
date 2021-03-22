@@ -11,6 +11,7 @@
 #include "Game/QuinnGameState.h"
 #include "World/EndLevelTrigger.h"
 #include "Characters/QuinnCharacter.h"
+#include "QEPlayerSaveData.h"
 
 AQuinnsEscapeGameMode::AQuinnsEscapeGameMode()
 {
@@ -61,44 +62,51 @@ void AQuinnsEscapeGameMode::OnGameOver(bool didCompleteLevel)
 
 	m_isLevelOver = true;
 
+	float completeTimeSeconds = 0;
+
 	// Get player controller and get HUD from PC.
 	APlayerController* pc = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (IsValid(pc))
+	if (!IsValid(pc))
 	{
-		AHUD* hud = pc->GetHUD();
-		// Set state to level complete
-		if (ALevel0HUD* lvlHUD = Cast<ALevel0HUD>(hud))
-		{
-			lvlHUD->SetHUDDisplayState(didCompleteLevel ? EHUDState::LevelComplete : EHUDState::LevelFailed);
-		}
-
-		// Display input for player
-		pc->SetIgnoreMoveInput(true);
-		pc->SetIgnoreLookInput(true);
-
-		// Cast controller char to Quinn
-		AQuinnCharacter* quinn = Cast<AQuinnCharacter>(pc->GetCharacter());
-		if (didCompleteLevel)
-		{
-			AGameStateBase* state = GetWorld()->GetGameState();
-			if (AQuinnGameState* quinnState = Cast<AQuinnGameState>(state))
-			{
-				double completeRewardScore = 50;
-				float averageCompletionSeconds = 60;	// 1 min
-				// Determine level complete multiplier
-				float completeMultiplier = averageCompletionSeconds / quinn->GetCharacterAliveDuration();
-				// Use Log2 to get multiplier
-				/*	Add determined value to 2 as to always give a positive multiplier
-					Log2(2) = 1, Log2(3) = 1.5, Log2(4) = 2, etc
-				*/
-				completeMultiplier = 2 + FMath::FloorLog2(completeMultiplier);
-				// Multiply complete score by bonus multiplier
-				double totalRewardScore = completeRewardScore * completeMultiplier;
-				// Add multiplied score to total
-				quinnState->AddScore(totalRewardScore);
-			}
-		}
+		return;
 	}
+
+	// Display input for player
+	pc->SetIgnoreMoveInput(true);
+	pc->SetIgnoreLookInput(true);
+
+	AHUD* hud = pc->GetHUD();
+	// Set state to level complete
+	if (ALevel0HUD* lvlHUD = Cast<ALevel0HUD>(hud))
+	{
+		lvlHUD->SetHUDDisplayState(didCompleteLevel ? EHUDState::LevelComplete : EHUDState::LevelFailed);
+	}
+
+	// Cast controller char to Quinn
+	AQuinnCharacter* quinn = Cast<AQuinnCharacter>(pc->GetCharacter());
+
+	// get game state and cast
+	AQuinnGameState* quinnGameState = Cast<AQuinnGameState>(GetWorld()->GetGameState());
+
+	if (didCompleteLevel)
+	{
+		double completeRewardScore = 50;
+		float averageCompletionSeconds = 60;	// 1 min
+		// Determine level complete multiplier
+		float completeMultiplier = averageCompletionSeconds / quinn->GetCharacterAliveDuration();
+		// Use Log2 to get multiplier
+		/*	Add determined value to 2 as to always give a positive multiplier
+			Log2(2) = 1, Log2(3) = 1.5, Log2(4) = 2, etc
+		*/
+		completeMultiplier = 2 + FMath::FloorLog2(completeMultiplier);
+		// Multiply complete score by bonus multiplier
+		double totalRewardScore = completeRewardScore * completeMultiplier;
+		// Add multiplied score to total
+		quinnGameState->AddScore(totalRewardScore);
+	}
+
+	FQESingleGameData gameData(quinn->GetCharacterAliveDuration(), quinnGameState->GetScore());
+	AddGameToSaveGame(gameData);
 }
 
 void AQuinnsEscapeGameMode::OnLevelComplete(AActor* endingTrigger, ACharacter* quinnChar)
@@ -157,4 +165,36 @@ bool AQuinnsEscapeGameMode::TryBindLevelFailedEvent()
 	}
 
 	return false;
+}
+
+void AQuinnsEscapeGameMode::AddGameToSaveGame(FQESingleGameData gameData)
+{
+	// Create single game data
+	if (UGameplayStatics::DoesSaveGameExist(SAVE_GAME_SLOT, SAVE_GAME_INDEX))
+	{
+		// Load existing save game
+		UQEPlayerSaveData* saveGame = Cast<UQEPlayerSaveData>(UGameplayStatics::LoadGameFromSlot(SAVE_GAME_SLOT, SAVE_GAME_INDEX));
+		saveGame->AddGameToHistory(gameData);
+		// Save game to slot
+		UGameplayStatics::SaveGameToSlot(saveGame, SAVE_GAME_SLOT, SAVE_GAME_INDEX);
+
+		UE_LOG(LogTemp, Log, TEXT("Saved game to existing save game"));
+
+		// Debug: delete for looping between these two
+		UGameplayStatics::DeleteGameInSlot(SAVE_GAME_SLOT, SAVE_GAME_INDEX);
+	}
+	else
+	{
+		// Create new save data and add first game
+		if (UQEPlayerSaveData* saveGame = Cast<UQEPlayerSaveData>(UGameplayStatics::CreateSaveGameObject(UQEPlayerSaveData::StaticClass())))
+		{
+			// Add to history
+			saveGame->AddGameToHistory(gameData);
+
+			// Save to slot
+			UGameplayStatics::SaveGameToSlot(saveGame, SAVE_GAME_SLOT, SAVE_GAME_INDEX);
+
+			UE_LOG(LogTemp, Log, TEXT("Created new save file and saved to slot"));
+		}
+	}
 }
