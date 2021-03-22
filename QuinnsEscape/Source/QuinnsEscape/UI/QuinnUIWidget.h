@@ -20,14 +20,22 @@ class QUINNSESCAPE_API UQuinnUIWidget : public UUserWidget
 private:
 	// Reference to the Quinn character
 	class AQuinnCharacter* m_quinn;
+	// Reference to game state
+	class AQuinnGameState* QuinnGameState;
 
 	/*
 	*	METHODS
 	*/
 protected:
+	// Called when Widget gets constructed
+	virtual void NativeConstruct() override;
+
 	// Gets the Quinn character
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
 	virtual class AQuinnCharacter* GetQuinnCharacter();
+	// Gets the current game state in the world, cast to AQuinnGameState
+	UFUNCTION(BlueprintCallable)
+	class AQuinnGameState* GetQuinnGameState();
 
 	// Gets the current health
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
@@ -43,8 +51,19 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
 	virtual int GetTotalLives();
 
-	// Called when Widget gets constructed
-	virtual void NativeConstruct() override;
+	// Gets the current score
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentScore();
+	// Gets the current multiplier
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentScoreMultiplier();
+
+	// Gets the time in seconds the Quinn character has been alive
+	UFUNCTION(BlueprintCallable)
+	float GetAliveDurationSeconds();
+	// Converts a seconds duration to a time (minute/seconds) format such as 00:00
+	UFUNCTION(BlueprintCallable)
+	FString ConvertSecondsToTimeFormat(float seconds);
 
 	// Adds blank or filled hearts to the given canvas panel with right/center alignment. 
 	// Requires the (Blueprint) class of the blank and filled heart widgets created in UMG.

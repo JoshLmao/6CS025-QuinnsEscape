@@ -8,6 +8,7 @@
 #include "Components/CanvasPanelSlot.h"
 
 #include "../Characters/QuinnCharacter.h"
+#include "../Game/QuinnGameState.h"
 
 void UQuinnUIWidget::NativeConstruct()
 {
@@ -23,6 +24,17 @@ void UQuinnUIWidget::NativeConstruct()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Widget '%s' unable to get reference to Quinn character!"), *GetName());
+	}
+	
+	// Get game state
+	AGameStateBase* state = GetWorld()->GetGameState();
+	if (state != nullptr)
+	{
+		QuinnGameState = Cast<AQuinnGameState>(state);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to determine QuinnGameState. UI Widget won't work!"));
 	}
 }
 
@@ -116,4 +128,64 @@ void UQuinnUIWidget::AddLivesToWidget(UCanvasPanel* panel, UClass* blankHeartWid
 		// Set it's position. No Y as Alignment does the work for us
 		slot->SetPosition(FVector2D(-xPosition, 0.0f));
 	}
+}
+
+AQuinnGameState* UQuinnUIWidget::GetQuinnGameState()
+{
+	return QuinnGameState;
+}
+
+float UQuinnUIWidget::GetCurrentScore()
+{
+	if (IsValid(QuinnGameState))
+	{
+		return QuinnGameState->GetScore();
+	}
+	return 0;
+}
+
+float UQuinnUIWidget::GetCurrentScoreMultiplier()
+{
+	if (IsValid(QuinnGameState))
+	{
+		return QuinnGameState->GetScoreMultiplier();
+	}
+	return 1.0f;
+}
+
+float UQuinnUIWidget::GetAliveDurationSeconds()
+{
+	if (m_quinn) {
+		return m_quinn->GetCharacterAliveDuration();
+	}
+	return 0;
+}
+
+FString UQuinnUIWidget::ConvertSecondsToTimeFormat(float seconds)
+{
+	// Determine seconds by modulus (%) seconds by 60
+	int secs = FMath::Fmod(seconds,  60);
+	// Determine mins by dividing current seconds by 60
+	int mins = seconds / 60;
+	
+	// Add 0 before minutes if less than 10
+	FString minsStr = "";
+	if (mins < 10)
+	{
+		minsStr += "0";
+	}
+	// Convert float to int to remove decimal
+	minsStr += FString::FromInt((int)mins);
+
+	// Add 0 before seconds if less than 10
+	FString secsStr = "";
+	if (secs < 10)
+	{
+		secsStr += "0";
+	}
+	// Convert float to int to remove decimal
+	secsStr += FString::FromInt((int)secs);
+
+	// Return format of "00:00"
+	return minsStr + ":" + secsStr;
 }
