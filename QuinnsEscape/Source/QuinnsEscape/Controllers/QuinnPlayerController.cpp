@@ -5,6 +5,7 @@
 #include "GameFramework/Pawn.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../Characters/QuinnCharacter.h"
+#include "../Game/QEPlayerSaveData.h"
 
 AQuinnPlayerController::AQuinnPlayerController()
 {
@@ -34,6 +35,8 @@ void AQuinnPlayerController::SetupInputComponent()
 	// Bind pressed and released of "Jump"
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AQuinnPlayerController::OnActionJump);
 	InputComponent->BindAction("Jump", IE_Released, this, &AQuinnPlayerController::OnActionStopJumping);
+	// Debug: Delete save game
+	InputComponent->BindAction("DeleteSaveGame", IE_Released, this, &AQuinnPlayerController::OnDeleteAllSaveGameData);
 
 	// Axis actions
 	InputComponent->BindAxis("MoveRight", this, &AQuinnPlayerController::OnAxisMoveRight);
@@ -119,4 +122,17 @@ void AQuinnPlayerController::OnActionStopJumping()
 	}
 
 	QuinnCharacter->StopJumping();
+}
+
+void AQuinnPlayerController::OnDeleteAllSaveGameData()
+{
+	bool result = UQEPlayerSaveData::DeleteAllData();
+	if (result)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Deleted existing save data!"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to delet all save data!"));
+	}
 }

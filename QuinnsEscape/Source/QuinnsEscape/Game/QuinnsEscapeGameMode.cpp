@@ -102,11 +102,12 @@ void AQuinnsEscapeGameMode::OnGameOver(bool didCompleteLevel)
 		// Multiply complete score by bonus multiplier
 		double totalRewardScore = completeRewardScore * completeMultiplier;
 		// Add multiplied score to total
-		quinnGameState->AddScore(totalRewardScore);
+		quinnGameState->AddScore(totalRewardScore); 
 	}
 
+	// Process current game to save file
 	FQESingleGameData gameData(quinn->GetCharacterAliveDuration(), quinnGameState->GetScore());
-	AddGameToSaveGame(gameData);
+	ProcessGameDataToSaveFile(gameData);
 }
 
 void AQuinnsEscapeGameMode::OnLevelComplete(AActor* endingTrigger, ACharacter* quinnChar)
@@ -167,34 +168,55 @@ bool AQuinnsEscapeGameMode::TryBindLevelFailedEvent()
 	return false;
 }
 
-void AQuinnsEscapeGameMode::AddGameToSaveGame(FQESingleGameData gameData)
+void AQuinnsEscapeGameMode::ProcessGameDataToSaveFile(FQESingleGameData gameData)
 {
-	// Create single game data
-	if (UGameplayStatics::DoesSaveGameExist(SAVE_GAME_SLOT, SAVE_GAME_INDEX))
+	// Load save game if exists
+	UQEPlayerSaveData* saveGame = UQEPlayerSaveData::GetCurrentSaveData();
+	if (IsValid(saveGame))
 	{
-		// Load existing save game
-		UQEPlayerSaveData* saveGame = Cast<UQEPlayerSaveData>(UGameplayStatics::LoadGameFromSlot(SAVE_GAME_SLOT, SAVE_GAME_INDEX));
 		saveGame->AddGameToHistory(gameData);
-		// Save game to slot
-		UGameplayStatics::SaveGameToSlot(saveGame, SAVE_GAME_SLOT, SAVE_GAME_INDEX);
 
 		UE_LOG(LogTemp, Log, TEXT("Saved game to existing save game"));
-
-		// Debug: delete for looping between these two
-		UGameplayStatics::DeleteGameInSlot(SAVE_GAME_SLOT, SAVE_GAME_INDEX);
 	}
 	else
 	{
 		// Create new save data and add first game
-		if (UQEPlayerSaveData* saveGame = Cast<UQEPlayerSaveData>(UGameplayStatics::CreateSaveGameObject(UQEPlayerSaveData::StaticClass())))
+		saveGame = Cast<UQEPlayerSaveData>(UGameplayStatics::CreateSaveGameObject(UQEPlayerSaveData::StaticClass()));
+		// Add to history
+		saveGame->AddGameToHistory(gameData);
+
+		UE_LOG(LogTemp, Log, TEXT("Created new save file and saved to slot"));
+	}
+
+	// check save data is valid
+	if (IsValid(saveGame))
+	{
+		// Validate game for high score
+		bool isNewHighScore = saveGame->ValidateHighScore(gameData);
+		if (isNewHighScore)
 		{
-			// Add to history
-			saveGame->AddGameToHistory(gameData);
+			UE_LOG(LogTemp, Log, TEXT("Score of '%f' is a new high score!"), gameData.Score);
+		}
 
-			// Save to slot
-			UGameplayStatics::SaveGameToSlot(saveGame, SAVE_GAME_SLOT, SAVE_GAME_INDEX);
+		// Print all high scores. ToDo: Show this in UI
+		// Get scores and check more than 0
+		TArray<FQESingleGameData> highScores = saveGame->GetHighScores();
+		if (highScores.Num() > 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("--- HIGH SCORES ---"));
+			// Iterate though all and print
+			for (int i = 0; i < highScores.Num(); i++)
+			{
+				// Parse complete date time
+				FDateTime dt;
+				FDateTime::ParseIso8601(*(highScores[i].CompleteDateTime), dt);
 
-			UE_LOG(LogTemp, Log, TEXT("Created new save file and saved to slot"));
+				UE_LOG(LogTemp, Log, TEXT("High Score '%d': DateTime: '%s', Score: '%f', Duration: '%f'"), i + 1, *dt.ToString(), highScores[i].Score, highScores[i].CompleteSeconds);
+			}
+			UE_LOG(LogTemp, Log, TEXT("--- END HIGH SCORES ---"));
 		}
 	}
+
+	// Save to slot
+	UQEPlayerSaveData::SaveData(saveGame);
 }

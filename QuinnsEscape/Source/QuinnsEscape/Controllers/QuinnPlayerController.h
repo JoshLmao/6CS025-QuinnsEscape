@@ -39,4 +39,7 @@ protected:
 	void OnActionJump();
 	// Action Input - Jump Released
 	void OnActionStopJumping();
+
+	// Debug: Delete all save game data
+	void OnDeleteAllSaveGameData();
 };

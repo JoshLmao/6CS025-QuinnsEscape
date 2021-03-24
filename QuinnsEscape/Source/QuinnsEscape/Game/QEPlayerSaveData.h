@@ -7,39 +7,42 @@
 #include "QEPlayerSaveData.generated.h"
 
 /*
-*	Data tracked for a single game of Quinn's Escape
+*	Data tracked for a single game of Quinn's Escape. Struct is stored in save game file.
+*	Only track vital/minimal information of a game
 */
-USTRUCT()
+USTRUCT(BlueprintType, Blueprintable)
 struct FQESingleGameData
 {
 	GENERATED_BODY()
 
 	// Time in seconds to complete the level
-	UPROPERTY(VisibleAnywhere, Category = Basic)
-	float TimeSeconds;
+	UPROPERTY(VisibleAnywhere)
+	float CompleteSeconds;
 	// Amount of score the player achieved
-	UPROPERTY(VisibleAnywhere, Category = Basic)
-	double Score;
-	// ISO8601 string representation of the date time this game was added
-	UPROPERTY(VisibleAnywhere, Category = Basic)
-	FString DateTime;
+	UPROPERTY(VisibleAnywhere)
+	float Score;
+	// ISO8601 string representation of the date time this game was completed
+	UPROPERTY(VisibleAnywhere)
+	FString CompleteDateTime;
 
 	// Default constructor
 	FQESingleGameData() 
 	{
-		DateTime = GetIsoDateTimeNow();
+		CompleteDateTime = FDateTime::UtcNow().ToIso8601();
 	}
 
 	// Constructor with all properties
-	FQESingleGameData(float time, double score)
+	FQESingleGameData(float time, float score, FString isoDateTimeStr = "")
 	{
-		TimeSeconds = time;
+		CompleteSeconds = time;
 		Score = score;
-		DateTime = GetIsoDateTimeNow();
+		
+		// If no iso string, set datetime to now
+		if (isoDateTimeStr.IsEmpty())
+			CompleteDateTime = FDateTime::UtcNow().ToIso8601();
+		else
+			CompleteDateTime = isoDateTimeStr;
 	}
-
-	// Gets the ISO8601 string representation of the time now
-	FString GetIsoDateTimeNow() { return FDateTime::UtcNow().ToIso8601(); }
 };
 
 /**
@@ -57,12 +60,23 @@ public:
 	*	VARIABLES
 	*/
 public:
+	// Save slot name to use
+	static const FString SAVE_GAME_SLOT;
+	// Save slot player index to use
+	static const int SAVE_GAME_INDEX = 1;
+
 	// Maximum amount of games to store in game history
 	const int MAX_GAME_HISTORY = 25;
+	// Maximum amount of games to be stores as a high score
+	const int MAX_HIGH_SCORE_GAMES = 5;
 
 	// List of all games played by player
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	TArray<FQESingleGameData> GameHistory;
+
+	// List of all high scores
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+	TArray<FQESingleGameData> HighScores;
 
 	/*
 	*	METHODS
@@ -70,5 +84,19 @@ public:
 public:
 	// Adds a game to the game history, also adds to high scores if necessary
 	void AddGameToHistory(FQESingleGameData game);
+	// Checks the given game to determine if it's a new high score against previous scores and adds it to the HighScores array if true
+	// Returns a bool of if the game was added or not
+	bool ValidateHighScore(FQESingleGameData game);
 
+	// Get all high scores, stored in order of highest. 0 = highest ever score
+	TArray<FQESingleGameData> GetHighScores();
+	// Get all games played
+	TArray<FQESingleGameData> GetGameHistory();
+
+	// Gets the current saved data
+	static UQEPlayerSaveData* GetCurrentSaveData();
+	// Saves the given save data
+	static bool SaveData(UQEPlayerSaveData* saveData);
+	// Deletes all save data
+	static bool DeleteAllData();
 };

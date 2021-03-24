@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../Game/QEPlayerSaveData.h"
 #include "QuinnUIWidget.generated.h"
 
 /**
@@ -63,7 +64,7 @@ protected:
 	float GetAliveDurationSeconds();
 	// Converts a seconds duration to a time (minute/seconds) format such as 00:00
 	UFUNCTION(BlueprintCallable)
-	FString ConvertSecondsToTimeFormat(float seconds);
+	static FString ConvertSecondsToTimeFormat(float seconds);
 
 	// Adds blank or filled hearts to the given canvas panel with right/center alignment. 
 	// Requires the (Blueprint) class of the blank and filled heart widgets created in UMG.

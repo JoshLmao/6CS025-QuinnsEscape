@@ -18,11 +18,6 @@ public:
 	// Default constructor
 	AQuinnsEscapeGameMode();
 
-	// Save slot name to use
-	const FString SAVE_GAME_SLOT = "SLOT_1";
-	// Save slot player index to use
-	const int SAVE_GAME_INDEX = 1;
-
 private:
 	bool m_isLevelOver;
 
@@ -50,6 +45,6 @@ private:
 	// Bind to any events that should trigger a "level failed"
 	bool TryBindLevelFailedEvent();
 
-	// Adds the given game data to the current save file
-	void AddGameToSaveGame(struct FQESingleGameData gameData);
+	// Process game data and add to save
+	void ProcessGameDataToSaveFile(struct FQESingleGameData gameData);
 };
