@@ -9,6 +9,7 @@
 
 #include "../Characters/QuinnCharacter.h"
 #include "../Game/QuinnGameState.h"
+#include "../Game/QEPlayerSaveData.h"
 
 void UQuinnUIWidget::NativeConstruct()
 {
@@ -36,6 +37,24 @@ void UQuinnUIWidget::NativeConstruct()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Unable to determine QuinnGameState. UI Widget won't work!"));
 	}
+}
+
+void UQuinnUIWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	// Detect if changed since last tick
+	if (m_lastIsVisibleToViewport != this->IsInViewport())
+	{
+		/*if (IsInViewportChanged.IsBound())
+		{
+			IsInViewportChanged.Broadcast(this->IsInViewport());
+		}*/
+		IsInViewportChanged(this->IsInViewport());
+	}
+
+	// Update to new state
+	m_lastIsVisibleToViewport = this->IsInViewport();
 }
 
 AQuinnCharacter* UQuinnUIWidget::GetQuinnCharacter()
@@ -188,4 +207,14 @@ FString UQuinnUIWidget::ConvertSecondsToTimeFormat(float seconds)
 
 	// Return format of "00:00"
 	return minsStr + ":" + secsStr;
+}
+
+TArray<FQESingleGameData> UQuinnUIWidget::GetAllHighScores()
+{
+	auto ptr = UQEPlayerSaveData::GetCurrentSaveData();
+	if (IsValid(ptr))
+	{
+		return ptr->GetHighScores();
+	}
+	return TArray<FQESingleGameData>();
 }

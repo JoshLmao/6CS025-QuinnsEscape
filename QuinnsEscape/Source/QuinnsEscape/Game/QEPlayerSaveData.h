@@ -16,34 +16,39 @@ struct FQESingleGameData
 	GENERATED_BODY()
 
 	// Time in seconds to complete the level
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite)
 	float CompleteSeconds;
 	// Amount of score the player achieved
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite)
 	float Score;
 	// ISO8601 string representation of the date time this game was completed
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite)
 	FString CompleteDateTime;
 
 	// Default constructor
-	FQESingleGameData() 
-	{
-		CompleteDateTime = FDateTime::UtcNow().ToIso8601();
-	}
-
+	FORCEINLINE FQESingleGameData();
 	// Constructor with all properties
-	FQESingleGameData(float time, float score, FString isoDateTimeStr = "")
-	{
-		CompleteSeconds = time;
-		Score = score;
-		
-		// If no iso string, set datetime to now
-		if (isoDateTimeStr.IsEmpty())
-			CompleteDateTime = FDateTime::UtcNow().ToIso8601();
-		else
-			CompleteDateTime = isoDateTimeStr;
-	}
+	explicit FORCEINLINE FQESingleGameData(float time, float score, FString isoDateTimeStr = "");
 };
+
+FORCEINLINE FQESingleGameData::FQESingleGameData()
+{
+	CompleteDateTime = FDateTime::UtcNow().ToIso8601();
+	CompleteSeconds = 0.0f;
+	Score = 0.0f;
+}
+
+FORCEINLINE FQESingleGameData::FQESingleGameData(const float time, const float score, FString isoDateTimeStr)
+{
+	CompleteSeconds = time;
+	Score = score;
+
+	// If no iso string, set datetime to now
+	if (isoDateTimeStr.IsEmpty())
+		CompleteDateTime = FDateTime::UtcNow().ToIso8601();
+	else
+		CompleteDateTime = isoDateTimeStr;
+}
 
 /**
  *	Save game class for handling any data that is required over sessions.

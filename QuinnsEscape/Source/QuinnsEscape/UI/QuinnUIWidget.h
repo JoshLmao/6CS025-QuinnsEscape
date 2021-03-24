@@ -7,6 +7,8 @@
 #include "../Game/QEPlayerSaveData.h"
 #include "QuinnUIWidget.generated.h"
 
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuinnWidgetIsInViewportChangedSignature, bool, IsInViewport);
+
 /**
  *	Widget for interfacing with the AQuinnCharacter that exists in the scene.
  */
@@ -23,6 +25,18 @@ private:
 	class AQuinnCharacter* m_quinn;
 	// Reference to game state
 	class AQuinnGameState* QuinnGameState;
+	// Last state of if the widget is visible on viewport
+	bool m_lastIsVisibleToViewport;
+
+	/*
+	*	EVENTS
+	*/
+public:
+	// Event for when IsInViewport has changed
+	//UPROPERTY(BlueprintNativeEvent)
+	//FQuinnWidgetIsInViewportChangedSignature IsInViewportChanged;
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void IsInViewportChanged(bool isInViewport);
 
 	/*
 	*	METHODS
@@ -30,6 +44,8 @@ private:
 protected:
 	// Called when Widget gets constructed
 	virtual void NativeConstruct() override;
+	// Called every tick
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	// Gets the Quinn character
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
@@ -70,4 +86,8 @@ protected:
 	// Requires the (Blueprint) class of the blank and filled heart widgets created in UMG.
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
 	virtual void AddLivesToWidget(class UCanvasPanel* panel, class UClass* blankHeartWidget, class UClass* filledHeartWidget);
+
+	// gets all high scores in save game
+	UFUNCTION(BlueprintCallable)
+	TArray<FQESingleGameData> GetAllHighScores();
 };
