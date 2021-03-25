@@ -52,6 +52,8 @@ private:
 	float m_camY;
 	// Current Z position of camera
 	float m_camZ;
+	// Value to lock the Z axis at
+	float m_zAxisLock;
 
 	/*
 	*	METHODS
@@ -59,6 +61,9 @@ private:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Locks the Z axis (up/dpwn) of the camera to a certain value
+	void LockZAxis(float zValue);
 
 protected:
 	// Called when the game starts or when spawned
