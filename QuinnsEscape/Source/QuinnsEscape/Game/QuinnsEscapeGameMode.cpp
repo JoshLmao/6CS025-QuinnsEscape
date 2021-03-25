@@ -88,7 +88,7 @@ void AQuinnsEscapeGameMode::OnGameOver(bool didCompleteLevel)
 	// get game state and cast
 	AQuinnGameState* quinnGameState = Cast<AQuinnGameState>(GetWorld()->GetGameState());
 
-	if (didCompleteLevel)
+	if (IsValid(quinnGameState) && didCompleteLevel)
 	{
 		double completeRewardScore = 50;
 		float averageCompletionSeconds = 60;	// 1 min
@@ -105,9 +105,12 @@ void AQuinnsEscapeGameMode::OnGameOver(bool didCompleteLevel)
 		quinnGameState->AddScore(totalRewardScore); 
 	}
 
-	// Process current game to save file
-	FQESingleGameData gameData(quinn->GetCharacterAliveDuration(), quinnGameState->GetScore());
-	ProcessGameDataToSaveFile(gameData);
+	if (IsValid(quinn) && IsValid(quinnGameState))
+	{
+		// Process current game to save file
+		FQESingleGameData gameData(quinn->GetCharacterAliveDuration(), quinnGameState->GetScore());
+		ProcessGameDataToSaveFile(gameData);
+	}
 }
 
 void AQuinnsEscapeGameMode::OnLevelComplete(AActor* endingTrigger, ACharacter* quinnChar)

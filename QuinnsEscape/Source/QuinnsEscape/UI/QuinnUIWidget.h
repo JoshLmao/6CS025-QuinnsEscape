@@ -10,7 +10,8 @@
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuinnWidgetIsInViewportChangedSignature, bool, IsInViewport);
 
 /**
- *	Widget for interfacing with the AQuinnCharacter that exists in the scene.
+ *	Widget for display UI elements relevant to Quinns Escape. 
+ *	Contains code to retrieve save data, Quinn character data and Score data
  */
 UCLASS()
 class QUINNSESCAPE_API UQuinnUIWidget : public UUserWidget
@@ -33,8 +34,7 @@ private:
 	*/
 public:
 	// Event for when IsInViewport has changed
-	//UPROPERTY(BlueprintNativeEvent)
-	//FQuinnWidgetIsInViewportChangedSignature IsInViewportChanged;
+	// Blueprint Event
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void IsInViewportChanged(bool isInViewport);
 

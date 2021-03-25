@@ -129,7 +129,6 @@ bool AHealthCharacter::TakeStomp(float damage)
 bool AHealthCharacter::OnCharacterDeath()
 {
 	// Ragdoll character on it's death
-	DetachFromControllerPendingDestroy();
 
 	// Disable any collision on main capsule
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

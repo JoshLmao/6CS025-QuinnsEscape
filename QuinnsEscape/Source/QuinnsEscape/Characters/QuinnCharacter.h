@@ -138,6 +138,9 @@ public:
 	// Stop jumping function
 	virtual void StopJumping() override;
 
+	// Called when character takes damage
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 protected:
 	// BeginPlay function called on Actor begin
 	virtual void BeginPlay() override;
@@ -145,9 +148,6 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// Tick function called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called when character takes damage
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	// Called when the character dies, runs out of health
 	virtual bool OnCharacterDeath() override;

@@ -165,6 +165,9 @@ bool AQuinnCharacter::OnCharacterDeath()
 		
 		// Call super on actual death
 		Super::OnCharacterDeath();
+
+		// Clear lifespan timer to not destroy character as it gets set in super
+		SetLifeSpan(0.0f);
 	}
 	else
 	{
@@ -172,6 +175,9 @@ bool AQuinnCharacter::OnCharacterDeath()
 
 		// Set health back to full
 		SetCurrentHealth(GetTotalHealth());
+
+		// Clear any velocity
+		GetCharacterMovement()->Velocity = FVector::ZeroVector;
 
 		// Set actors location to start location
 		ACheckpoint* checkpoint = GetLastCheckpoint();

@@ -46,10 +46,7 @@ void UQuinnUIWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	// Detect if changed since last tick
 	if (m_lastIsVisibleToViewport != this->IsInViewport())
 	{
-		/*if (IsInViewportChanged.IsBound())
-		{
-			IsInViewportChanged.Broadcast(this->IsInViewport());
-		}*/
+		// Trigger event for viewport changed
 		IsInViewportChanged(this->IsInViewport());
 	}
 
