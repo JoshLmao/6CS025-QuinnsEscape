@@ -5,9 +5,13 @@
 #include "Components/ShapeComponent.h"
 #include "../Projectiles/ProjectileBase.h"
 #include "PuzzleEscapeDoor.h"
+#include "../Game/QuinnGameState.h"
 
 AProjectileEscapeTrigger::AProjectileEscapeTrigger()
 {
+	//Default values
+	PointsReward = 100.0f;
+
 	// Get component and bind overlap event
 	if (this->GetCollisionComponent() != nullptr)
 	{
@@ -23,7 +27,20 @@ void AProjectileEscapeTrigger::OnTriggerBeginOverlap(UPrimitiveComponent* Overla
 		// Check escape door has been set
 		if (IsValid(EscapeDoor))
 		{
-			EscapeDoor->RaiseEscape();
+			// 
+			EscapeDoor->OpenEscape();
+
+			if (PointsReward > 0)
+			{
+				// Get game state
+				AGameStateBase* baseGS = GetWorld()->GetGameState();
+				if (IsValid(baseGS))
+				{
+					// Cast and add points
+					AQuinnGameState* quinnState = Cast<AQuinnGameState>(baseGS);
+					quinnState->AddScore(PointsReward);
+				}
+			}
 		}
 		else
 		{

@@ -7,7 +7,8 @@
 // Sets default values
 APuzzleEscapeDoor::APuzzleEscapeDoor()
 {
-	RaiseAmount = FVector(0, 0, 250.0f);
+	OpenAmount = FVector(-250.0f, 0, 0);	// Move to left
+	Speed = 4.0f;
 
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -23,6 +24,7 @@ void APuzzleEscapeDoor::BeginPlay()
 
 	// Store start location on begin
 	m_startLocation = this->GetActorLocation();
+	m_openedLocation = this->GetActorLocation() + OpenAmount;
 }
 
 // Called every frame
@@ -32,17 +34,23 @@ void APuzzleEscapeDoor::Tick(float DeltaTime)
 
 	if (m_bIsRaising)
 	{
-		// ToDo: lerp from starting position to 
-		FVector raisedLoc = this->GetActorLocation() + RaiseAmount;
-		this->SetActorLocation(raisedLoc);
+		// Lerp from start to opened location
+		FVector lerpLocation = FMath::Lerp(m_startLocation, m_openedLocation, m_lerpValue);
+		this->SetActorLocation(lerpLocation);
 
-		m_bIsRaised = true;
-		m_bIsRaising = false;
+		// Increment lerp
+		m_lerpValue += (Speed * DeltaTime);
+
+		// Check if lerp is completed
+		if (m_lerpValue >= 1.0f)
+		{
+			m_bIsRaised = true;
+			m_bIsRaising = false;
+		}
 	}
 }
 
-
-void APuzzleEscapeDoor::RaiseEscape()
+void APuzzleEscapeDoor::OpenEscape()
 {
 	if (m_bIsRaised || m_bIsRaising)
 	{

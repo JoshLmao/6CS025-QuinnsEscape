@@ -21,7 +21,11 @@ public:
 public:
 	// Amount of units to move the escape door
 	UPROPERTY(EditAnywhere)
-	FVector RaiseAmount;
+	FVector OpenAmount;
+
+	// Speed at which to open the door at
+	UPROPERTY(EditAnywhere)
+	float Speed;
 
 private:
 	// Has the door already been raised?
@@ -30,6 +34,10 @@ private:
 	bool m_bIsRaising;
 	// Location to start lerping from (beginning position)
 	FVector m_startLocation;
+	// Location of door when opened
+	FVector m_openedLocation;
+	// Current lerp position
+	float m_lerpValue;
 
 	// Mesh representation of the door
 	UPROPERTY(VisibleAnywhere)
@@ -46,5 +54,5 @@ public:
 
 	// Raises the escape door to allow the player to leave
 	UFUNCTION(BlueprintCallable)
-	void RaiseEscape();
+	void OpenEscape();
 };
