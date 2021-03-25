@@ -26,6 +26,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ATargetPoint* TeleportTarget;
 
+	// Z amount to lock the camera to when entering the access trigger. 0 to remain free/follow player
+	UPROPERTY(EditAnywhere)
+	float CameraLockZ;
+
 	/*
 	*	METHODS
 	*/

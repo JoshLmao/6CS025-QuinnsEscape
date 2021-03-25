@@ -4,10 +4,15 @@
 #include "PuzzleAccessTrigger.h"
 #include "Components/ShapeComponent.h"
 #include "Engine/TargetPoint.h"
+#include "Kismet/GameplayStatics.h"
 #include "../Characters/QuinnCharacter.h"
+#include "../World/DeadzoneCamera.h"
 
 APuzzleAccessTrigger::APuzzleAccessTrigger()
 {
+	TeleportTarget = nullptr;
+	CameraLockZ = 0;
+
 	if (this->GetCollisionComponent() != nullptr)
 	{
 		this->GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this, &APuzzleAccessTrigger::OnTriggerBeginOverlap);
@@ -23,6 +28,16 @@ void APuzzleAccessTrigger::OnTriggerBeginOverlap(UPrimitiveComponent* Overlapped
 		if (IsValid(TeleportTarget))
 		{
 			OtherActor->SetActorLocation(TeleportTarget->GetActorLocation(), false);
+
+			// Get camera from level
+			TArray<AActor*> actors;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADeadzoneCamera::StaticClass(), actors);
+			if (actors.Num() > 0)
+			{
+				// Cast to deadzone and lock Z
+				ADeadzoneCamera* camera = Cast<ADeadzoneCamera>(actors[0]);
+				camera->LockZAxis(CameraLockZ);
+			}
 		}
 		else
 		{
