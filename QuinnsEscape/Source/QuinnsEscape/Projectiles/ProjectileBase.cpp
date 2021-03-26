@@ -90,7 +90,7 @@ void AProjectileBase::AddActorToIgnore(AActor* actor)
 void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// Check if other actor is of class that should be ignored
-	if (m_ignoreActors.Num() > 0)
+ 	if (m_ignoreActors.Num() > 0)
 	{
 		for (AActor* actor : m_ignoreActors)
 		{
@@ -102,21 +102,29 @@ void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComp
 		}
 	}
 
-	// Check other actor is an actor that contains health
-	if (OtherActor->IsA(AHealthCharacter::StaticClass()))
+	// Ignore collision with self or other projectile
+ 	if (OtherActor->IsA(AProjectileBase::StaticClass()))
+		return;
+
+	// Collided with actor (Terrain/Character)
+	if (OtherActor->IsA(AActor::StaticClass()))
 	{
-		AHealthCharacter* healthCharacter = Cast<AHealthCharacter>(OtherActor);
-		// Actor is a HealthCharacter
-		healthCharacter->TakeDamage(GetDamage(), FDamageEvent(), nullptr, this);
-
-		UE_LOG(LogTemp, Log, TEXT("Projectile '%s' collided with Character '%s' and dealth '%f' damage (%f/%f)"), *this->GetName(), *healthCharacter->GetName(), GetDamage(), healthCharacter->GetCurrentHealth(), healthCharacter->GetTotalHealth());
-
-		// Get game state and add score reward
-		AGameStateBase* baseState = GetWorld()->GetGameState();
-		if (IsValid(baseState))
+		// Check other actor is an character that contains health
+		if (OtherActor->IsA(AHealthCharacter::StaticClass()))
 		{
-			AQuinnGameState* quinnState = Cast<AQuinnGameState>(baseState);
-			quinnState->AddScore(healthCharacter->GetHitScoreReward());
+			AHealthCharacter* healthCharacter = Cast<AHealthCharacter>(OtherActor);
+			// Actor is a HealthCharacter
+			healthCharacter->TakeDamage(GetDamage(), FDamageEvent(), nullptr, this);
+
+			UE_LOG(LogTemp, Log, TEXT("Projectile '%s' collided with Character '%s' and dealth '%f' damage (%f/%f)"), *this->GetName(), *healthCharacter->GetName(), GetDamage(), healthCharacter->GetCurrentHealth(), healthCharacter->GetTotalHealth());
+
+			// Get game state and add score reward
+			AGameStateBase* baseState = GetWorld()->GetGameState();
+			if (IsValid(baseState))
+			{
+				AQuinnGameState* quinnState = Cast<AQuinnGameState>(baseState);
+				quinnState->AddScore(healthCharacter->GetHitScoreReward());
+			}
 		}
 
 		// Destroy projectile as it's collided with another actor

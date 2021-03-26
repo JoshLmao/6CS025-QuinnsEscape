@@ -34,10 +34,10 @@ public:
 	*/
 private:
 	// Root capsule component to handle colliding
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	class UCapsuleComponent* m_rootCapsuleComponent;
 	// Component to handle moving actor as a projectile
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* m_projectileMovementComponent;
 
 	// Amount of damage to deal out to the recieveing actor
