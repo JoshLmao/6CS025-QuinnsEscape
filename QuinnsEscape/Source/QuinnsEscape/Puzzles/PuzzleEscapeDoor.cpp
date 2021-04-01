@@ -34,12 +34,12 @@ void APuzzleEscapeDoor::Tick(float DeltaTime)
 
 	if (m_bIsRaising)
 	{
+		// Increment lerp
+		m_lerpValue += (Speed * DeltaTime);
+
 		// Lerp from start to opened location
 		FVector lerpLocation = FMath::Lerp(m_startLocation, m_openedLocation, m_lerpValue);
 		this->SetActorLocation(lerpLocation);
-
-		// Increment lerp
-		m_lerpValue += (Speed * DeltaTime);
 
 		// Check if lerp is completed
 		if (m_lerpValue >= 1.0f)

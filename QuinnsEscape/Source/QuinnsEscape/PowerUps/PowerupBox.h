@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "World/HeadHittableBox.h"
 #include "PowerupBox.generated.h"
 
 /*
 * Box that can be hit from below to spawn a powerup
 */
 UCLASS()
-class QUINNSESCAPE_API APowerupBox : public AActor
+class QUINNSESCAPE_API APowerupBox : public AHeadHittableBox
 {
 	GENERATED_BODY()
 	
@@ -35,14 +35,6 @@ public:
 	int MaxPowerupSpawnCount;
 
 protected:
-	// Collider to be placed below the box to detect collision and spawning powerup
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BeneathBoxCollider;
-
-	// Mesh component for the powerup box
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComponent;
-
 	// Text component used to represent a character to show this box is breakable
 	UPROPERTY(EditAnywhere)
 	class ATextRenderActor* TextComponent;
@@ -64,7 +56,7 @@ public:
 
 private:
 	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnBoxRecievedHeadHit(ACharacter* character);
 
 	// Spawns a random powerup from the available powerups.
 	// Returns if spawn was successful
@@ -76,8 +68,4 @@ private:
 
 	// Can this box spawn a powerup
 	bool CanSpawnPowerup();
-
-	// Creates the TextComponent to display text infront of box
-	void CreateTextComponent();
-
 };
