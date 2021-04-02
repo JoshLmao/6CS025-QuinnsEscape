@@ -18,12 +18,6 @@ void ALevel0HUD::BeginPlay()
 	m_createdLvlFailedWidgets = CreateAllWidgets(LevelFailWidgets);
 }
 
-void ALevel0HUD::DrawHUD()
-{
-	Super::DrawHUD();
-
-}
-
 void ALevel0HUD::SetHUDDisplayState(EHUDState hudState)
 {
 	// Set the correct widget on viewport states depending on state

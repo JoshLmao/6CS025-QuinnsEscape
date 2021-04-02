@@ -65,7 +65,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void DrawHUD() override;
 
 private:
 	// Creates widgets from list of widget classes and returns the list of created widgets.
