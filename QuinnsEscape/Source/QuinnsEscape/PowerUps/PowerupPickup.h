@@ -37,6 +37,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Spin Animation")
 	float ZMoveAmount;
 
+	// Should the spin animation spin left. False or unchecked to spin right
+	UPROPERTY(EditANywhere, Category = "Spin Animation")
+	bool bRotateLeft;
+
 protected:
 	// Root mesh component for visual
 	UPROPERTY(EditAnywhere)

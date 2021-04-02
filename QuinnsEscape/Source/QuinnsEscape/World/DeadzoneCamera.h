@@ -40,7 +40,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float ZDeadzone;
 
-	// Fixed height value to lock to instead of following the height
+	// Fixed height value to lock to instead of following the height. If 0, the Z won't be locked to this value
 	UPROPERTY(EditAnywhere)
 	float FixedZValue;
 

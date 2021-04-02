@@ -95,7 +95,12 @@ void APowerupPickup::DoSpinAnimation(float deltaTime)
 {
 	// Add spin
 	FRotator lastRotator = this->GetActorRotation();
-	lastRotator = lastRotator + (FRotator(0, RotationSpeed * deltaTime, 0));
+	// Spin correct direction
+	if (bRotateLeft)
+		lastRotator = lastRotator + (FRotator(0, RotationSpeed * deltaTime, 0));
+	else
+		lastRotator = lastRotator - (FRotator(0, RotationSpeed * deltaTime, 0));
+
 	SetActorRotation(lastRotator);
 
 	// Bob up and down
