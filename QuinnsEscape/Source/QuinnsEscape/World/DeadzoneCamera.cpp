@@ -12,7 +12,8 @@ ADeadzoneCamera::ADeadzoneCamera()
 	YDeadzone = 500;
 	ZDeadzone = 200;
 	CameraFieldOfView = 80.0f;
-	m_camY = m_camZ = 0;
+	m_camY = 0;
+	m_camZ = 1000; // set at higher
 	m_zAxisLock = 0;
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.

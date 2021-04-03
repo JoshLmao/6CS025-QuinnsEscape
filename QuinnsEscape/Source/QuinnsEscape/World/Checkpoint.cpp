@@ -55,9 +55,10 @@ void ACheckpoint::BeginPlay()
 	if (!m_staticMesh->GetStaticMesh() && CheckpointMesh)
 	{
 		m_staticMesh->SetStaticMesh(CheckpointMesh);
-		m_staticMesh->SetRelativeLocation(FVector(85, 0, -100));
-		m_staticMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 	}
+
+	m_staticMesh->SetRelativeLocation(FVector(85, 0, -100));
+	m_staticMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 }
 
 void ACheckpoint::Tick(float deltaTime)

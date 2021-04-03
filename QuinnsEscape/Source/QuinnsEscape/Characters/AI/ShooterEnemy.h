@@ -78,9 +78,12 @@ private:
 	// Timer handle for firing at player when in range
 	FTimerHandle m_fireDelayHandle;
 	// Current state of the enemy
-	EShooterStates m_currentState;
+	UPROPERTY(VisibleAnywhere)
+	TEnumAsByte<EShooterStates> m_currentState;
 	// Current state of the FSM
 	EFSMStates m_fsmState;
+	// Current controller casted to an AI controller
+	class AAIController* AIController;
 
 	/*
 	*	METHODS

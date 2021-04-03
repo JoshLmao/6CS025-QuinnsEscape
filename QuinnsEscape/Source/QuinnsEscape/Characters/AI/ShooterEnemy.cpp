@@ -5,6 +5,8 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "AIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #include "Projectiles/ProjectileBase.h"
 
@@ -12,7 +14,7 @@ AShooterEnemy::AShooterEnemy()
 {
 	// Set default values
 	DetectionRadius = 750.0f;
-	ShootingRadius = 400.0f;
+	ShootingRadius = 500.0f;
 	ShootingInteval = 1.0f;		// One second
 	ProjectileSpeed = 1.0f;
 	ProjectileDamage = FFloatRange(10.0f, 15.0f);
@@ -22,6 +24,11 @@ AShooterEnemy::AShooterEnemy()
 
 	TargetClass = AHealthCharacter::StaticClass();
 	ProjectileClass = AProjectileBase::StaticClass();
+
+	// Set to be controlled by AI
+	AIControllerClass = AAIController::StaticClass();
+
+	GetCharacterMovement()->bCanWalkOffLedges = true;
 }
 
 void AShooterEnemy::BeginPlay()
@@ -37,6 +44,9 @@ void AShooterEnemy::BeginPlay()
 		TargetCharacter = Cast<ACharacter>(foundActors[0]);
 		UE_LOG(LogTemp, Log, TEXT("NPC '%s' targeting character '%s'"), *this->GetName(), *TargetCharacter->GetName());
 	}
+
+	// Get controller as AI Controller
+	AIController = Cast<AAIController>(GetController());
 }
 
 void AShooterEnemy::Tick(float deltaTime)
@@ -150,16 +160,34 @@ void AShooterEnemy::Idle_Tick(float deltaTime)
 
 void AShooterEnemy::Chasing_Begin()
 {
+	// Move to target's location
+	if (IsValid(AIController))
+	{
+		EPathFollowingRequestResult::Type result = AIController->MoveToLocation(TargetCharacter->GetActorLocation());
+		if (result != EPathFollowingRequestResult::Type::RequestSuccessful)
+		{
+			//UE_LOG(LogTemp, Error, TEXT("Chase Start: Request = %s"), result == EPathFollowingRequestResult::Type::Failed ? TEXT("FAILED") : TEXT("AT GOAL"));
+		}
+	}
 }
 
 void AShooterEnemy::Chasing_Tick(float deltaTime)
 {
 	if (IsValid(TargetCharacter))
 	{
-		// Is target character within detection radius of this enemy
+		// Keep attempting to move to location with the previous request wasnt successul
+		if (AIController->GetMoveStatus() != EPathFollowingRequestResult::Type::RequestSuccessful)
+		{
+			AIController->MoveToLocation(TargetCharacter->GetActorLocation());
+		}
+
+		// Check if target character within detection radius of this enemy
 		float dist = FVector::Dist(this->GetActorLocation(), TargetCharacter->GetActorLocation());
 		if (dist <= ShootingRadius)
 		{
+			// Stop any move requests before transitioning state
+			AIController->StopMovement();
+
 			SetShooterState(EShooterStates::Shooting);
 		}
 	}
@@ -179,6 +207,16 @@ void AShooterEnemy::Shooting_Begin()
 
 void AShooterEnemy::Shooting_Tick(float deltaTime)
 {
+	if (IsValid(TargetCharacter))
+	{
+		float dist = FVector::Dist(this->GetActorLocation(), TargetCharacter->GetActorLocation());
+		if (dist > ShootingRadius)
+		{
+			GetWorldTimerManager().ClearTimer(m_fireDelayHandle);
+
+			SetShooterState(EShooterStates::Chasing);
+		}
+	}
 }
 
 void AShooterEnemy::Dead_Begin()
