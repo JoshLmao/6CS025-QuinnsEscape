@@ -79,6 +79,29 @@ void AHealthCharacter::FellOutOfWorld(const UDamageType& dmgType)
 	}
 }
 
+FVector AHealthCharacter::GetHalfLocationWithOffset(float yOffset)
+{
+	// Get half height and radius of capsule
+	float halfHeight, radius;
+	GetCapsuleComponent()->GetScaledCapsuleSize(radius, halfHeight);
+
+	// Determine location to be in the middle of character
+	FVector btmCenterLocation = GetActorLocation();
+	// Determine location half way up character
+	FVector upAxisHalfHeightOffset = GetActorUpVector() * (halfHeight / 2);
+	// Add center offset to btm center
+	FVector halfLocation = btmCenterLocation + upAxisHalfHeightOffset;
+	
+	// Set X to same X as actor
+	halfLocation.X = this->GetActorLocation().X;
+	
+	// Add the given offset
+	halfLocation.Y += yOffset;
+
+	// Return final spawn locatino
+	return halfLocation;
+}
+
 void AHealthCharacter::DealDamage(float damage)
 {
 	// Reduce health by damage amount 

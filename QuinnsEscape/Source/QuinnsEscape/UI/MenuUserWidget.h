@@ -7,7 +7,8 @@
 #include "MenuUserWidget.generated.h"
 
 /**
- * 
+ *	Main Menu User Widget.
+ *	Contains methods related to getting and setting functionality for the game
  */
 UCLASS()
 class QUINNSESCAPE_API UMenuUserWidget : public UUserWidget

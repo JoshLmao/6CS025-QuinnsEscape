@@ -4,6 +4,7 @@
 #include "Checkpoint.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 #include "../Characters/QuinnCharacter.h"
 #include "../Game/QuinnGameState.h"
@@ -34,6 +35,15 @@ ACheckpoint::ACheckpoint()
 	m_staticMesh->SetupAttachment(RootComponent);
 	// Ignore any/all collision on mesh
 	m_staticMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+
+	// Add checkpoint mesh model if exists
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> checkpointLocalAsset(TEXT("/Game/QuinnsEscape/Models/CheckpointFlag"));
+	if (checkpointLocalAsset.Succeeded())
+	{
+		m_staticMesh->SetStaticMesh(checkpointLocalAsset.Object);
+		m_staticMesh->SetRelativeLocation(FVector(85, 0, -100));
+		m_staticMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -41,8 +51,8 @@ void ACheckpoint::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Add checkpoint mesh model if exists
-	if (CheckpointMesh)
+	// If mesh hasn't been set and a mesh is given, set now
+	if (!m_staticMesh->GetStaticMesh() && CheckpointMesh)
 	{
 		m_staticMesh->SetStaticMesh(CheckpointMesh);
 		m_staticMesh->SetRelativeLocation(FVector(85, 0, -100));

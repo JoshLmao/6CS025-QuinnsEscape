@@ -48,7 +48,8 @@ void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	// Set a default life span
+	SetLifeSpan(10.0f);
 }
 
 // Called every frame

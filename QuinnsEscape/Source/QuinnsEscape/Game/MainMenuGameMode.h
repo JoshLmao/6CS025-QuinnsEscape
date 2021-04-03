@@ -7,7 +7,8 @@
 #include "MainMenuGameMode.generated.h"
 
 /**
- * 
+ *	Main menu game mode.
+ *	Used on main menu to disable input and free mouse
  */
 UCLASS()
 class QUINNSESCAPE_API AMainMenuGameMode : public AGameModeBase

@@ -215,21 +215,8 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 		return;
 	}
 
+	/// Debug
 	//UE_LOG(LogTemp, Log, TEXT("Firing projectile!"));
-
-	// Create spawn location with offset and spawn into world
-	FVector forwardVector = direction - GetActorLocation();
-	forwardVector.Normalize();
-
-	float halfHeight, radius;
-	GetCapsuleComponent()->GetScaledCapsuleSize(radius, halfHeight);
-
-	// Determine location to be in the middle of character
-	FVector actorLoc = GetActorLocation();
-	FVector heightOffset = GetActorUpVector() * (halfHeight / 2);
-	FVector spawnLocation = actorLoc + heightOffset;
-	spawnLocation.X = GetActorLocation().X;
-
 	//DrawDebugSphere(GetWorld(), spawnLocation, 20.0f, 4, FColor::Green, false, 5.0f, 0, 2.0f);
 
 	// Spawn blueprint template projectile actor
@@ -257,7 +244,8 @@ void AQuinnCharacter::FireProjectile(FVector direction)
 		// Set damage on projectile
 		projectile->SetDamage(rndDmg);
 
-		projectileActor->SetActorLocation(spawnLocation, false);
+		FVector halfLocation = GetHalfLocationWithOffset(0.0f);
+		projectileActor->SetActorLocation(halfLocation, false);
 	}
 
 	// Set firing on cooldown

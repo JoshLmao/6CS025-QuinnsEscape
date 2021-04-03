@@ -117,6 +117,11 @@ protected:
 	// Override falling out of the world
 	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
 
+	// Gets a FVector location that is in the middle of the character.
+	// Also adds the given offset amount on the Y axis (left/right in 2D). 
+	// Offset can be a negative to get middle-left, positive for middle-right
+	FVector GetHalfLocationWithOffset(float yOffset);
+
 private:
 	// Deals an amount of damage to the character
 	void DealDamage(float damage);
