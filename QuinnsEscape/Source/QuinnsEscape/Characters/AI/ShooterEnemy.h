@@ -47,10 +47,12 @@ public:
 	// Amount of units the target can enter before enemy starts to approach
 	UPROPERTY(EditAnywhere, Category = ShooterEnemyProperties)
 	float DetectionRadius;
+	// Is this shooter a static, non-moving shooting enemy
+	UPROPERTY(EditAnywhere, Category = ShooterEnemyProperties)
+	bool bIsStatic;
 	// Amount of units this enemy should be from the target to start firing
 	UPROPERTY(EditAnywhere, Category = ShooterEnemyProperties)
 	float ShootingRadius;
-
 	// Amount of time in seconds in between shooting
 	UPROPERTY(EditAnywhere, Category = ShooterEnemyProperties)
 	float ShootingInteval;
@@ -123,4 +125,11 @@ private:
 
 	// Shoots at the current target character
 	void ShootAtTarget();
+
+	// Is the given actor within detection radius of this enemy
+	bool IsInDetectionRadius(AActor* actor);
+	// Is the given actor within firing radius of this enemy
+	bool IsInShootingRadius(AActor* actor);
+	// Checks if actor is within a certain distance
+	bool IsWithinDistance(AActor* actor, float distance);
 };

@@ -18,6 +18,7 @@ AShooterEnemy::AShooterEnemy()
 	ShootingInteval = 1.0f;		// One second
 	ProjectileSpeed = 1.0f;
 	ProjectileDamage = FFloatRange(10.0f, 15.0f);
+	bIsStatic = false;
 
 	m_currentState = EShooterStates::Idle;
 	m_fsmState = EFSMStates::Begin;
@@ -62,7 +63,7 @@ bool AShooterEnemy::OnCharacterDeath()
 	bool isDead = Super::OnCharacterDeath();
 
 	// Check if fire timer is active and stop
-	if (GetWorldTimerManager().IsTimerPending(m_fireDelayHandle))
+	if (GetWorldTimerManager().IsTimerActive(m_fireDelayHandle))
 	{
 		GetWorldTimerManager().ClearTimer(m_fireDelayHandle);
 	}
@@ -149,11 +150,15 @@ void AShooterEnemy::Idle_Tick(float deltaTime)
 {
 	if (IsValid(TargetCharacter))
 	{
-		// Is target character within detection radius of this enemy
-		float dist = FVector::Dist(this->GetActorLocation(), TargetCharacter->GetActorLocation());
-		if (dist <= DetectionRadius)
+		// If not static, check for detection radius
+		if (IsInDetectionRadius(TargetCharacter) && !bIsStatic)
 		{
 			SetShooterState(EShooterStates::Chasing);
+		}
+		// If static, check for in shooting range
+		if (IsInShootingRadius(TargetCharacter) && bIsStatic)
+		{
+			SetShooterState(EShooterStates::Shooting);
 		}
 	}
 }
@@ -182,8 +187,7 @@ void AShooterEnemy::Chasing_Tick(float deltaTime)
 		}
 
 		// Check if target character within detection radius of this enemy
-		float dist = FVector::Dist(this->GetActorLocation(), TargetCharacter->GetActorLocation());
-		if (dist <= ShootingRadius)
+		if (IsInShootingRadius(TargetCharacter))
 		{
 			// Stop any move requests before transitioning state
 			AIController->StopMovement();
@@ -209,12 +213,16 @@ void AShooterEnemy::Shooting_Tick(float deltaTime)
 {
 	if (IsValid(TargetCharacter))
 	{
-		float dist = FVector::Dist(this->GetActorLocation(), TargetCharacter->GetActorLocation());
-		if (dist > ShootingRadius)
+		if (!IsInShootingRadius(TargetCharacter))
 		{
 			GetWorldTimerManager().ClearTimer(m_fireDelayHandle);
 
-			SetShooterState(EShooterStates::Chasing);
+			// If static, set to idle
+			// Move to chasing if not static
+			if (bIsStatic)
+				SetShooterState(EShooterStates::Idle);
+			else
+				SetShooterState(EShooterStates::Chasing);
 		}
 	}
 }
@@ -262,4 +270,20 @@ void AShooterEnemy::ShootAtTarget()
 			projectile->SetActorLocation(halfLocation);
 		}
 	}
+}
+
+bool AShooterEnemy::IsInDetectionRadius(AActor* actor)
+{
+	return IsWithinDistance(actor, DetectionRadius);
+}
+
+bool AShooterEnemy::IsInShootingRadius(AActor* actor)
+{
+	return IsWithinDistance(actor, ShootingRadius);
+}
+
+bool AShooterEnemy::IsWithinDistance(AActor* actor, float distance)
+{
+	float dist = FVector::Dist(this->GetActorLocation(), actor->GetActorLocation());
+	return dist <= distance;
 }
