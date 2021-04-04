@@ -132,4 +132,6 @@ private:
 	bool IsInShootingRadius(AActor* actor);
 	// Checks if actor is within a certain distance
 	bool IsWithinDistance(AActor* actor, float distance);
+
+	void LookAtTarget(FVector targetLocation);
 };

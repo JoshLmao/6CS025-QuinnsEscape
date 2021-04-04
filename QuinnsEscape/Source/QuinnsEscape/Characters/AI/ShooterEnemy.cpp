@@ -7,6 +7,7 @@
 #include "Engine/World.h"
 #include "AIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "Projectiles/ProjectileBase.h"
 
@@ -275,6 +276,20 @@ void AShooterEnemy::ShootAtTarget()
 bool AShooterEnemy::IsInDetectionRadius(AActor* actor)
 {
 	return IsWithinDistance(actor, DetectionRadius);
+}
+
+void AShooterEnemy::LookAtTarget(FVector targetLocation)
+{
+	// Set Actor to look at target actor
+	FRotator lookAt = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), targetLocation);
+	FRotator actorRotation = this->GetActorRotation();
+	actorRotation.Yaw = lookAt.Yaw + -90.0f;			// Add Yaw offset
+	actorRotation.Roll = actorRotation.Pitch = 0.0f;	// Enforce other axis' to 0
+
+	this->SetActorRotation(actorRotation);
+
+	// Also set Controller's look rotation
+	GetController()->SetControlRotation(actorRotation);
 }
 
 bool AShooterEnemy::IsInShootingRadius(AActor* actor)

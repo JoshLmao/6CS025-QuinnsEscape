@@ -24,8 +24,8 @@ void AStandardBoxSeries::BeginPlay()
 	for (int i = 1; i <= SeriesCount; i++)
 	{
 		// Calculate location
-		float boxWidth = 100.0f;
-		float padding = 10.0f;
+		float boxWidth = 100.0f;	// width of one AStandardBox 
+		float padding = 15.0f;		// Total padding on both sides of the actor
 		// Right vector requires inverting since we're designing level left to right (+Y to -Y)
 		FVector rightVector = (-this->GetActorRightVector());
 		FVector rightWithOffset = rightVector * ((i * boxWidth) + (i * padding));
@@ -34,7 +34,7 @@ void AStandardBoxSeries::BeginPlay()
 		// Spawn new box
 		AActor* box = GetWorld()->SpawnActor<AActor>(AStandardBox::StaticClass(), newLocation, FRotator());
 		// Set as child of this actor
-		FAttachmentTransformRules rules(EAttachmentRule::SnapToTarget, true);
+		FAttachmentTransformRules rules(EAttachmentRule::KeepWorld, true);
 		box->AttachToActor(this, rules);
 
 		if (!IsValid(box))
