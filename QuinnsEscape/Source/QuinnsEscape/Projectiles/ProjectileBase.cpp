@@ -5,8 +5,11 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Engine/TriggerBox.h"
+
 #include "../Characters/HealthCharacter.h"
 #include "../Game/QuinnGameState.h"
+#include "World/Checkpoint.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -105,6 +108,12 @@ void AProjectileBase::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComp
 
 	// Ignore collision with self or other projectile
  	if (OtherActor->IsA(AProjectileBase::StaticClass()))
+		return;
+	// Ignore checkpoint collision
+	if (OtherActor->IsA(ACheckpoint::StaticClass()))
+		return;
+	// Ignore any triggers
+	if (OtherActor->IsA(ATriggerBox::StaticClass()))
 		return;
 
 	// Collided with actor (Terrain/Character)
