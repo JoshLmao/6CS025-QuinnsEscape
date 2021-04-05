@@ -9,6 +9,9 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/TextRenderActor.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
+#include "QuinnGameplayStatics.h"
 
 // Sets default values
 AHeadHittableBox::AHeadHittableBox()
@@ -39,6 +42,9 @@ AHeadHittableBox::AHeadHittableBox()
 	// Add local offset & set extent (default values)
 	BeneathBoxCollider->AddRelativeLocation(FVector(0, 0, -65.0f));
 	BeneathBoxCollider->SetBoxExtent(FVector(55, 55, 20));
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	AudioComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -59,6 +65,12 @@ void AHeadHittableBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 		{
 			// Increment total head hit count
 			m_recievedHeadHitCount++;
+
+			// Play hit sound if valid
+			if (IsValid(HitSound))
+			{
+				QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, HitSound, 0.9f, 1.1f);
+			}
 
 			// Trigger recieved head hit event
 			if (OnRecievedHeadHit.IsBound())

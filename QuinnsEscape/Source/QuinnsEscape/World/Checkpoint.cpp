@@ -5,9 +5,11 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Components/AudioComponent.h"
 
 #include "../Characters/QuinnCharacter.h"
 #include "../Game/QuinnGameState.h"
+#include "QuinnGameplayStatics.h"
 
 // Sets default values
 ACheckpoint::ACheckpoint()
@@ -44,6 +46,10 @@ ACheckpoint::ACheckpoint()
 		m_staticMesh->SetRelativeLocation(FVector(85, 0, -100));
 		m_staticMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 	}
+
+	// Setup audio component
+	m_audioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	m_audioComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -112,6 +118,12 @@ void ACheckpoint::OnPlayerPassCheckpoint(AActor* playerActor)
 	{
 		quinn->SetCheckpoint(this);
 		UE_LOG(LogTemp, Log, TEXT("Player passed through '%s' checkpoint! Set as latest checkpoint"), *GetName());
+
+		// Play activated sound if set
+		if (IsValid(ActivatedSound))
+		{
+			QuinnGameplayStatics::PlaySoundRndPitch(m_audioComponent, ActivatedSound, 0.9f, 1.1f);
+		}
 	}
 
 	// Get game state and reward player

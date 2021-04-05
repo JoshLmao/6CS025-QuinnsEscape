@@ -6,7 +6,11 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Sound/SoundBase.h"
+#include "Components/AudioComponent.h"
+
 #include "../Game/QuinnGameState.h"
+#include "QuinnGameplayStatics.h"
 
 // Sets default values
 AHealthCharacter::AHealthCharacter()
@@ -21,6 +25,10 @@ AHealthCharacter::AHealthCharacter()
 	// Set the total and current health to default values on start
 	m_currentHealth = 0;
 	m_totalHealth = 100;
+
+	// Create audio component
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	AudioComponent->SetupAttachment(RootComponent);
 
 	//Enable overlap events on capsule
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
@@ -47,6 +55,11 @@ void AHealthCharacter::Tick(float DeltaTime)
 	{
 		m_aliveTimeSecs += DeltaTime;
 	}
+
+	if (m_hitSoundCurrentCooldown > 0)
+	{
+		m_hitSoundCurrentCooldown -= DeltaTime;
+	}
 }
 
 // Called to bind functionality to input
@@ -64,6 +77,13 @@ float AHealthCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 	// Deal amount to player
 	DealDamage(damage);
 
+	// Play hit sound if not on cooldown and is set
+	if (IsValid(HitSound) && m_hitSoundCurrentCooldown <= 0)
+	{
+		QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, HitSound, 0.85f, 1.2f);
+		m_hitSoundCurrentCooldown = HitSoundCooldown;
+	}
+
 	return damage;
 }
 
@@ -76,6 +96,28 @@ void AHealthCharacter::FellOutOfWorld(const UDamageType& dmgType)
 	if (m_currentHealth <= 0 && GetDestroyOnFall())
 	{
 		Super::FellOutOfWorld(dmgType);
+	}
+}
+
+void AHealthCharacter::LaunchCharacter(FVector LaunchVelocity, bool bXYOverride, bool bZOverride)
+{
+	Super::LaunchCharacter(LaunchVelocity, bXYOverride, bZOverride);
+
+	// Play jump sound when being launched (NavLinkProxy)
+	if (IsValid(JumpSound))
+	{
+		QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, JumpSound, 0.8f, 1.2f);
+	}
+}
+
+void AHealthCharacter::Jump()
+{
+	Super::Jump();
+
+	// Play jump sound on normal jump
+	if (IsValid(JumpSound))
+	{
+		QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, JumpSound, 0.8f, 1.2f);
 	}
 }
 
@@ -180,6 +222,12 @@ bool AHealthCharacter::OnCharacterDeath()
 	// Disappear character after delay
 	float timeoutSpan = 10.0f;
 	SetLifeSpan(timeoutSpan);
+
+	// Play death sound is set
+	if (IsValid(DeathSound))
+	{
+		QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, DeathSound, 0.85f, 1.20f);
+	}
 
 	UE_LOG(LogTemp, Log, TEXT("Character '%s' has died. Lifespan of '%f' seconds"), *GetName(), timeoutSpan);
 

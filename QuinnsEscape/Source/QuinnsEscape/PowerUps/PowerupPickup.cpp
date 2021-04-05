@@ -6,9 +6,13 @@
 #include "Components/PointLightComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Components/BoxComponent.h"
-#include "../Characters/QuinnCharacter.h"
 #include "Engine/World.h"
+#include "Sound/SoundBase.h"
+#include "Components/AudioComponent.h"
+
+#include "../Characters/QuinnCharacter.h"
 #include "../Game/QuinnGameState.h"
+#include "QuinnGameplayStatics.h"
 
 // Sets default values
 APowerupPickup::APowerupPickup()
@@ -20,7 +24,6 @@ APowerupPickup::APowerupPickup()
 	m_animGoUp = true;
 	m_minZ = m_maxZ = 0;
 	
-
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -47,6 +50,9 @@ APowerupPickup::APowerupPickup()
 	PointLight->SetupAttachment(RootComponent);
 	PointLight->SetLightColor(LightColor);
 	PointLight->SetRelativeLocation(FVector(0, 0, 50));		// Add some height to offset from floor
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	AudioComponent->SetupAttachment(RootComponent);
 }
 
 void APowerupPickup::PostEditChangeProperty(struct FPropertyChangedEvent& e)
@@ -83,7 +89,7 @@ void APowerupPickup::Tick(float DeltaTime)
 void APowerupPickup::OnActorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// Detect Quinn character picks up ability
-	if (OtherActor->IsA(AQuinnCharacter::StaticClass()))
+	if (OtherActor->IsA(AQuinnCharacter::StaticClass()) && !m_isPickedUp)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Quinn overlapped with '%s'"), *this->GetName());
 
@@ -91,8 +97,18 @@ void APowerupPickup::OnActorBeginOverlap(UPrimitiveComponent* OverlappedComponen
 		APawn* pawn = Cast<APawn>(OtherActor);
 		ApplyEffects(pawn);
 
-		// Destroy pickup once complete
-		this->Destroy();
+		if (IsValid(PickupSound))
+		{
+			QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, PickupSound, 0.9f, 1.1f);
+		}
+
+		// Remove mesh, become invisible. Set light invisible
+		StaticMeshComponent->SetStaticMesh(nullptr);
+		PointLight->SetIntensity(0.0f);
+		// Destroy once sound has finished playing
+		this->SetLifeSpan(3.0f);
+
+		m_isPickedUp = true;
 	}
 }
 

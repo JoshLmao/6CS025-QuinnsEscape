@@ -52,6 +52,24 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Scoring")
 	double KilledScore;
 
+protected:
+	// Sound to play when the character runs out of health (dies)
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	class USoundBase* DeathSound;
+	// Sound to play when the character gets hit. Will only play when off cooldown, if HitSoundCooldown is more than 0
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	class USoundBase* HitSound;
+	// Sound to play when the character performs a jump (or launched in the air)
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	class USoundBase* JumpSound;
+	// Time in seconds for the HitSound to be on cooldown and not be played again until this cooldown is over
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	float HitSoundCooldown;
+
+	// Main audio component of the character
+	UPROPERTY(VisibleAnywhere)
+	class UAudioComponent* AudioComponent;
+
 private:
 	// Current health of the character
 	float m_currentHealth;
@@ -63,6 +81,8 @@ private:
 	bool m_shouldDestroyOnFall;
 	// Time in seconds the character has been alive for
 	float m_aliveTimeSecs;
+	// Current cooldown of the hit sound
+	float m_hitSoundCurrentCooldown;
 
 	/*
 	*	EVENTS
@@ -71,15 +91,6 @@ public:
 	// Event for when the character dies with no health remaining
 	UPROPERTY(BlueprintAssignable)
 	FHealthCharDeathSignature OnCharacterDied;
-
-	// Gets the amount of score to reward to the other character for a regular hit to this character
-	double GetHitScoreReward();
-	// Sets the amount of score to reward the other character with when hit with a regular attack
-	void SetHitScoreReward(double score);
-	// Gets the amount of score to reward when this character dies
-	double GetKilledScoreReward();
-	// Sets the amount of score to reward when this character dies
-	void SetKilledScoreReward(double score);
 
 	/*
 	*	METHODS
@@ -111,11 +122,23 @@ public:
 	// Deal a stomp to this character and return if successfuly dealth damage
 	bool TakeStomp(float damage);
 
+	// Gets the amount of score to reward to the other character for a regular hit to this character
+	double GetHitScoreReward();
+	// Sets the amount of score to reward the other character with when hit with a regular attack
+	void SetHitScoreReward(double score);
+	// Gets the amount of score to reward when this character dies
+	double GetKilledScoreReward();
+	// Sets the amount of score to reward when this character dies
+	void SetKilledScoreReward(double score);
+
 protected:
 	// Overridable method called when character has ran out of health. Returns bool of if the character should die or not
 	virtual bool OnCharacterDeath();
 	// Override falling out of the world
 	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
+
+	virtual void LaunchCharacter(FVector LaunchVelocity, bool bXYOverride, bool bZOverride) override;
+	virtual void Jump() override;
 
 	// Gets a FVector location that is in the middle of the character.
 	// Also adds the given offset amount on the Y axis (left/right in 2D). 

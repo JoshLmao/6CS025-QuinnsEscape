@@ -45,6 +45,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	FLinearColor LightColor;
 
+	// Sound to play when the player picks up this power-up
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	class USoundBase* PickupSound;
+
 protected:
 	// Root mesh component for visual
 	UPROPERTY(VisibleAnywhere)
@@ -55,11 +59,15 @@ protected:
 	// Light around the power-up that emits a color around the power-up
 	UPROPERTY(VisibleAnywhere)
 	class UPointLightComponent* PointLight;
+	// Audio component of the pickup
+	UPROPERTY(VisibleAnywhere)
+	class UAudioComponent* AudioComponent;
 
 private:
 	bool m_animGoUp;
 	float m_minZ;
 	float m_maxZ;
+	bool m_isPickedUp;
 	
 	/*
 	*	METHODS

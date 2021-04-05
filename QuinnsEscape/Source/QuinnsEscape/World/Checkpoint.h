@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Checkpoint Details")
 	// Static mesh to use on the checkpoint
 	class UStaticMesh* CheckpointMesh;
+	// Sound to p[lay when the player reaches and activates
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	class USoundBase* ActivatedSound;
 
 private:
 	// Root box component to use as trigger
@@ -40,6 +43,9 @@ private:
 	// Mesh component of the checkpoint
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* m_staticMesh;
+	// Audio component to play sounds
+	UPROPERTY(VisibleAnywhere)
+	class UAudioComponent* m_audioComponent;
 	// Has the player passed through this checkpoint yet
 	bool m_hasPassed;
 	// Count to use to lerp and rotate mesh

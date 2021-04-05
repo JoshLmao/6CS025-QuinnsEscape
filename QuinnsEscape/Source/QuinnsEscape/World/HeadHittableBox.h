@@ -32,6 +32,14 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* MeshComponent;
 
+	// Audio component of the box
+	UPROPERTY(VisibleAnywhere)
+	class UAudioComponent* AudioComponent;
+
+	// Sound to play when the box has been hit with the player's head
+	UPROPERTY(EditAnywhere)
+	class USoundBase* HitSound;
+
 private:
 	// Amount of times character has hit box with their head
 	int m_recievedHeadHitCount;

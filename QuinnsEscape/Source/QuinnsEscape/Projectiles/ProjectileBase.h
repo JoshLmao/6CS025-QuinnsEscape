@@ -32,6 +32,14 @@ public:
 	/*
 	*	VARIABLES
 	*/
+protected:
+	// Audio component of the projectile
+	UPROPERTY(VisibleAnywhere)
+	class UAudioComponent* AudioComponent;
+	// Sound to play this projectile gets fired (spawned)
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	class USoundBase* ProjectileFireSound;
+
 private:
 	// Root capsule component to handle colliding
 	UPROPERTY(VisibleAnywhere)

@@ -11,6 +11,7 @@
 #include "GameFramework/PlayerController.h"
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
+#include "Sound/SoundBase.h"
 
 #include "../Projectiles/ProjectileBase.h"
 #include "../World/Checkpoint.h"

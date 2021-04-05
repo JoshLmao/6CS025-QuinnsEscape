@@ -6,10 +6,13 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Engine/TriggerBox.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 
 #include "../Characters/HealthCharacter.h"
 #include "../Game/QuinnGameState.h"
 #include "World/Checkpoint.h"
+#include "QuinnGameplayStatics.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -44,6 +47,10 @@ AProjectileBase::AProjectileBase()
 	m_projectileMovementComponent->bShouldBounce = true;
 	m_projectileMovementComponent->Bounciness = 0.3f;
 	m_projectileMovementComponent->ProjectileGravityScale = 0.0f;
+
+	// Create audio component
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	AudioComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -53,6 +60,12 @@ void AProjectileBase::BeginPlay()
 	
 	// Set a default life span
 	SetLifeSpan(10.0f);
+
+	// Set sound and play on creation
+	if (IsValid(ProjectileFireSound))
+	{
+		QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, ProjectileFireSound, 0.9f, 1.1f);
+	}
 }
 
 // Called every frame

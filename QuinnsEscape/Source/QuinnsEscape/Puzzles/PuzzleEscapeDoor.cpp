@@ -3,6 +3,9 @@
 
 #include "PuzzleEscapeDoor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
+#include "QuinnGameplayStatics.h"
 
 // Sets default values
 APuzzleEscapeDoor::APuzzleEscapeDoor()
@@ -15,6 +18,9 @@ APuzzleEscapeDoor::APuzzleEscapeDoor()
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	RootComponent = MeshComponent;
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	AudioComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -52,10 +58,17 @@ void APuzzleEscapeDoor::Tick(float DeltaTime)
 
 void APuzzleEscapeDoor::OpenEscape()
 {
+	// If in the process of opening or open, dont do anything
 	if (m_bIsRaised || m_bIsRaising)
 	{
 		return;
 	}
 
 	m_bIsRaising = true;
+
+	// Play sound if it's been set
+	if (IsValid(OpenSound))
+	{
+		QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, OpenSound, 0.9f, 1.1f);
+	}
 }

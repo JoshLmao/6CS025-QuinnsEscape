@@ -27,6 +27,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	float Speed;
 
+protected:
+	// Sound to play when the door opens
+	UPROPERTY(EditAnywhere)
+	class USoundBase* OpenSound;
+	// Audio component of actor
+	UPROPERTY(VisibleAnywhere)
+	class UAudioComponent* AudioComponent;
+
 private:
 	// Has the door already been raised?
 	bool m_bIsRaised;
