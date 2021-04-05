@@ -21,9 +21,15 @@ void ACoinBonusPowerup::ApplyEffects(APawn* collidedPawn)
 	// Get QuinnGameState
 	if (AQuinnGameState* gameState = this->GetQuinnGameState())
 	{
-		// Add score before multiplier
-		gameState->AddScore(InitialScore);
-		// Set score multiplier
-		gameState->SetDurationScoreMultiplier(ScoreMultiplier, MultiplierDuration);
+		// Add score before multiplier if valid value
+		if (InitialScore > 0)
+		{
+			gameState->AddScore(InitialScore);
+		}
+		// Set score multiplier if more than 1
+		if (ScoreMultiplier > 1)
+		{
+			gameState->SetDurationScoreMultiplier(ScoreMultiplier, MultiplierDuration);
+		}
 	}
 }

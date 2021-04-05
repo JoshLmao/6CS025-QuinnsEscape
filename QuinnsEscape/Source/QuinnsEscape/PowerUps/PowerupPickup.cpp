@@ -3,6 +3,7 @@
 
 #include "PowerupPickup.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/PointLightComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Components/BoxComponent.h"
 #include "../Characters/QuinnCharacter.h"
@@ -12,11 +13,13 @@
 // Sets default values
 APowerupPickup::APowerupPickup()
 {
+	// Default values
 	RotationSpeed = 25.0f;
 	FloatSpeed = 5.0f;
 	ZMoveAmount = 10.0f;
 	m_animGoUp = true;
 	m_minZ = m_maxZ = 0;
+	
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -29,6 +32,8 @@ APowerupPickup::APowerupPickup()
 	// Set Mesh if set
 	if (IsValid(Mesh))
 		StaticMeshComponent->SetStaticMesh(Mesh);
+	// Set to not cast shadow for point light
+	StaticMeshComponent->SetCastShadow(false);
 
 	// Create box trigger
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Trigger"));
@@ -36,6 +41,24 @@ APowerupPickup::APowerupPickup()
 	BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &APowerupPickup::OnActorBeginOverlap);
 	// Set trigger size
 	BoxTrigger->SetBoxExtent(FVector(75, 75, 75));
+
+	// Setup the point light
+	PointLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("PointLight"));
+	PointLight->SetupAttachment(RootComponent);
+	PointLight->SetLightColor(LightColor);
+	PointLight->SetRelativeLocation(FVector(0, 0, 50));		// Add some height to offset from floor
+}
+
+void APowerupPickup::PostEditChangeProperty(struct FPropertyChangedEvent& e)
+{
+	// Detect a property change in editor for LightColor
+	FName PropertyName = (e.Property != NULL) ? e.Property->GetFName() : NAME_None;
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(APowerupPickup, LightColor))
+	{
+		//various uproperty tricks, see link
+		PointLight->SetLightColor(LightColor);
+	}
+	Super::PostEditChangeProperty(e);
 }
 
 // Called when the game starts or when spawned

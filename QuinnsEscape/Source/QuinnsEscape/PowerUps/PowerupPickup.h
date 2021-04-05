@@ -38,16 +38,23 @@ public:
 	float ZMoveAmount;
 
 	// Should the spin animation spin left. False or unchecked to spin right
-	UPROPERTY(EditANywhere, Category = "Spin Animation")
+	UPROPERTY(EditAnywhere, Category = "Spin Animation")
 	bool bRotateLeft;
+
+	// Linear Color to set the light component to
+	UPROPERTY(EditAnywhere)
+	FLinearColor LightColor;
 
 protected:
 	// Root mesh component for visual
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* StaticMeshComponent;
 	// Box component to detect overlap with characters
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* BoxTrigger;
+	// Light around the power-up that emits a color around the power-up
+	UPROPERTY(VisibleAnywhere)
+	class UPointLightComponent* PointLight;
 
 private:
 	bool m_animGoUp;
@@ -64,10 +71,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 	// Apply the powerup effects to the collided pawn.
 	virtual void ApplyEffects(APawn* collidedPawn);
-	 
+	// When property gets updated in editor
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
+
 	// Gets the game state and casts it to AQuinnGameState
 	class AQuinnGameState* GetQuinnGameState();
 
