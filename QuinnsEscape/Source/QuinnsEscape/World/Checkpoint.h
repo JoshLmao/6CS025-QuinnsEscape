@@ -35,10 +35,10 @@ public:
 
 private:
 	// Root box component to use as trigger
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* m_pointTrigger;
 	// Mesh component of the checkpoint
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* m_staticMesh;
 	// Has the player passed through this checkpoint yet
 	bool m_hasPassed;
