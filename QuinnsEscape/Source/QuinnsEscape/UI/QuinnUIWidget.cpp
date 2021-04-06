@@ -67,6 +67,12 @@ float UQuinnUIWidget::GetCurrentHealth()
 	return 0.0f;
 }
 
+int UQuinnUIWidget::GetCurrentHealthRounded()
+{
+	float health = this->GetCurrentHealth();
+	return FMath::RoundToInt(health);
+}
+
 float UQuinnUIWidget::GetTotalHealth()
 {
 	if (IsValid(m_quinn)) {

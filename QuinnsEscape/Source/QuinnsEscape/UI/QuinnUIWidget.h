@@ -56,10 +56,13 @@ protected:
 
 	// Gets the current health
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
-	virtual float GetCurrentHealth();
+	float GetCurrentHealth();
+	// Gets the current health , rounded to the nearest whole number
+	UFUNCTION(BlueprintCallable, Category = "Quinn")
+	int GetCurrentHealthRounded();
 	// Gets the total health
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
-	virtual float GetTotalHealth();
+	float GetTotalHealth();
 
 	// Gets the current amount of lives Quinn has
 	UFUNCTION(BlueprintCallable, Category = "Quinn")
