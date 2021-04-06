@@ -21,7 +21,10 @@ void AVelocityLinkProxy::BeginPlay()
 void AVelocityLinkProxy::LaunchCharacter(AActor* MovingActor, const FVector& DestinationPoint)
 {
 	// Check if need to add velocity if destination is higher than current location
-	if (MovingActor->GetActorLocation().Z < DestinationPoint.Z)
+	FVector actorLoc = MovingActor->GetActorLocation();
+	float halfHeight = MovingActor->GetSimpleCollisionHalfHeight();
+	// Minus the half height of the character to get the floor position, proxy's are placed at floor height
+	if (actorLoc.Z - halfHeight <= DestinationPoint.Z)
 	{
 		// Check its a character so we can add velocity/jump
 		if (MovingActor->IsA(ACharacter::StaticClass()))
