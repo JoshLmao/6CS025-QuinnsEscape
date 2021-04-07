@@ -1,2 +1,28 @@
-# 6CS025-QuinnsEscape
+# Quinn's Escape (6CS025)
+
+
+[![releases](https://img.shields.io/badge/download-/releases/-green.svg?style=flat-square)](https://github.com/JoshLmao/6CS025-QuinnsEscape/releases)
+
 Side scrolling 2.5D game created in Unreal Engine 4.22.3. Escape from the labyrinth as Quinn by defeating AI enemies and escape!
+
+The game was initially designed through a design document to specify the full extent of the game. The design document can be read [here](./Team%20J&S%20Design%20Document.pdf)
+
+<p align="center">
+	<img src="https://user-images.githubusercontent.com/22716832/113855790-5877c700-9798-11eb-8bae-f88d569fbaa3.jpg" width="80%" />
+</p>
+
+### Controllers
+
+All controllers contain functionality, either from AI or the player, are located at [```\Source\QuinnsEscape\Controllers```]((/QuinnsEscape/Source/QuinnsEscape/Controllers/)). 
+
+### Characters
+
+All characters are located at [```/Source/QuinnsEscape/Characters/```](/QuinnsEscape/Source/QuinnsEscape/Characters/), including non-playable characters such as AI in the [```/NPC/```](/QuinnsEscape/Source/QuinnsEscape/Characters/NPC/) folder. 
+
+### 3D Models
+
+The models used in Quinn's Escape were either free and royalty free or created by ourselves.
+
+* [Mannequinn (Third Person Character template)](https://docs.unrealengine.com/en-US/Resources/Templates/ThirdPerson/index.html)
+* [Low Poly Heart](https://www.cgtrader.com/free-3d-models/character/anatomy/love-low-poly)
+* [Gold Coin](https://www.cgtrader.com/free-3d-models/character/fantasy/super-mario-style-golden-coin)
