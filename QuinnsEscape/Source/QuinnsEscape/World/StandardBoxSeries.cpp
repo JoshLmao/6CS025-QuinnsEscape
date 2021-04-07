@@ -13,6 +13,7 @@ void AStandardBoxSeries::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Destroy any boxes if they exist
 	if (SeriesBoxes.Num() > 0)
 	{
 		for (AActor* box : SeriesBoxes)
@@ -21,6 +22,7 @@ void AStandardBoxSeries::BeginPlay()
 		}
 	}
 
+	// Iterate for count and spawn, set location
 	for (int i = 1; i <= SeriesCount; i++)
 	{
 		// Calculate location
@@ -32,7 +34,7 @@ void AStandardBoxSeries::BeginPlay()
 		// Add offset to location
 		FVector newLocation = this->GetActorLocation() + rightWithOffset;
 		// Spawn new box
-		AActor* box = GetWorld()->SpawnActor<AActor>(AStandardBox::StaticClass(), newLocation, FRotator());
+		AActor* box = GetWorld()->SpawnActor<AActor>(AStandardBox::StaticClass(), newLocation, FRotator(0, 0, 0));
 		// Set as child of this actor
 		FAttachmentTransformRules rules(EAttachmentRule::KeepWorld, true);
 		box->AttachToActor(this, rules);

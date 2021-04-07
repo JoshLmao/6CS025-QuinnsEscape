@@ -99,9 +99,12 @@ public:
 	TArray<FQESingleGameData> GetGameHistory();
 
 	// Gets the current saved data
+	UFUNCTION(BlueprintCallable)
 	static UQEPlayerSaveData* GetCurrentSaveData();
 	// Saves the given save data
+	UFUNCTION(BlueprintCallable)
 	static bool SaveData(UQEPlayerSaveData* saveData);
 	// Deletes all save data
+	UFUNCTION(BlueprintCallable)
 	static bool DeleteAllData();
 };
