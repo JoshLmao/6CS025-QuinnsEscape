@@ -23,12 +23,45 @@ AShooterEnemy::AShooterEnemy()
 
 	TargetClass = AHealthCharacter::StaticClass();
 	ProjectileClass = AProjectileBase::StaticClass();
-
-	// Set to be controlled by AI
+	
+	// Set to be controlled by specific Shooter FSM
 	AIControllerClass = AShooterFSMController::StaticClass();
+	// Set place or spawn to possessed by AI Controller
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	GetCharacterMovement()->bCanWalkOffLedges = true;
 	GetCharacterMovement()->MaxWalkSpeed = 550.0f;	// 50 more than player
+}
+
+void AShooterEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Get controller as AI Controller
+	AIController = Cast<AAIController>(GetController());
+	if (!IsValid(AIController))
+	{
+		UE_LOG(LogTemp, Error, TEXT("No reference to AIController in '%s'!"), *this->GetName());
+	}
+}
+
+void AShooterEnemy::Tick(float deltaTime)
+{
+	Super::Tick(deltaTime);
+
+}
+
+bool AShooterEnemy::OnCharacterDeath()
+{
+	bool isDead = Super::OnCharacterDeath();
+
+	// Check if fire timer is active and stop
+	if (GetWorldTimerManager().IsTimerActive(m_fireDelayHandle))
+	{
+		GetWorldTimerManager().ClearTimer(m_fireDelayHandle);
+	}
+
+	return isDead;
 }
 
 float AShooterEnemy::GetDetectionRadius()
@@ -49,33 +82,6 @@ bool AShooterEnemy::IsStaticEnemy()
 void AShooterEnemy::SetTargetCharacter(ACharacter* target)
 {
 	TargetCharacter = target;
-}
-
-void AShooterEnemy::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// Get controller as AI Controller
-	AIController = Cast<AAIController>(GetController());
-}
-
-void AShooterEnemy::Tick(float deltaTime)
-{
-	Super::Tick(deltaTime);
-
-}
-
-bool AShooterEnemy::OnCharacterDeath()
-{
-	bool isDead = Super::OnCharacterDeath();
-
-	// Check if fire timer is active and stop
-	if (GetWorldTimerManager().IsTimerActive(m_fireDelayHandle))
-	{
-		GetWorldTimerManager().ClearTimer(m_fireDelayHandle);
-	}
-
-	return isDead;
 }
 
 void AShooterEnemy::ShootAtTarget()

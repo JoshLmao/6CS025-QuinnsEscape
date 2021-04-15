@@ -114,10 +114,14 @@ void AHealthCharacter::Jump()
 {
 	Super::Jump();
 
-	// Play jump sound on normal jump
-	if (IsValid(JumpSound))
+	// Check if a valid jump can be done
+	if (CanJump())
 	{
-		QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, JumpSound, 0.8f, 1.2f);
+		// Play jump sound on normal jump
+		if (IsValid(JumpSound))
+		{
+			QuinnGameplayStatics::PlaySoundRndPitch(AudioComponent, JumpSound, 0.8f, 1.2f);
+		}
 	}
 }
 

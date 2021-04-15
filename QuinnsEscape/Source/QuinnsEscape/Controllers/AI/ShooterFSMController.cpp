@@ -52,6 +52,7 @@ void AShooterFSMController::OnPossess(APawn* pawn)
 	if (pawn->IsA(AShooterEnemy::StaticClass()))
 	{
 		m_possesedCharacter = Cast<AShooterEnemy>(pawn);
+		m_possesedCharacter->OnCharacterDied.AddDynamic(this, &AShooterFSMController::OnPossesedPawnDeath);
 	}
 }
 
@@ -231,4 +232,10 @@ bool AShooterFSMController::IsWithinDistance(AActor* fromActor, AActor* toActor,
 {
 	float dist = FVector::Dist(fromActor->GetActorLocation(), toActor->GetActorLocation());
 	return dist <= distance;
+}
+
+void AShooterFSMController::OnPossesedPawnDeath()
+{
+	// When character dies, set FSM state to dead
+	SetShooterState(EShooterStates::Dead);
 }

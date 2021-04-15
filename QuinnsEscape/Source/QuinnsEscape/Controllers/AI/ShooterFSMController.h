@@ -93,4 +93,8 @@ private:
 	bool IsInShootingRadius(AActor* actor);
 	// Checks if this actor is within a certain distance of another actor
 	bool IsWithinDistance(AActor* fromActor, AActor* toActor, float distance);
+
+	// Reciever function to the OnCharacterDeath event
+	UFUNCTION()
+	void OnPossesedPawnDeath();
 };
