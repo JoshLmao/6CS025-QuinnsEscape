@@ -108,7 +108,7 @@ void AQuinnsEscapeGameMode::OnGameOver(bool didCompleteLevel)
 	if (IsValid(quinn) && IsValid(quinnGameState))
 	{
 		// Process current game to save file
-		FQESingleGameData gameData(quinn->GetCharacterAliveDuration(), quinnGameState->GetScore());
+		FQESingleGameData gameData(quinn->GetCharacterAliveDuration(), quinnGameState->GetScore(), didCompleteLevel);
 		ProcessGameDataToSaveFile(gameData);
 	}
 }

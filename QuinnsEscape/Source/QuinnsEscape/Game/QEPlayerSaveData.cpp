@@ -26,13 +26,13 @@ void UQEPlayerSaveData::AddGameToHistory(FQESingleGameData game)
 
 bool UQEPlayerSaveData::ValidateHighScore(FQESingleGameData game)
 {
-	if (HighScores.Num() <= 0)
+	if (HighScores.Num() < MAX_HIGH_SCORE_GAMES)
 	{
 		// No high scores, add game
 		HighScores.Add(game);
 		return true;
 	}
-	else // HighScores.Num() > 0
+	else // HighScores.Num() >= MAX_HIGH_SCORE_GAMES
 	{
 		// Iterate though all high scores to see if current game beats a previous
 		for (int i = 0; i < HighScores.Num(); i++)

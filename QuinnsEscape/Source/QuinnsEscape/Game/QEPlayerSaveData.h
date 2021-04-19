@@ -24,11 +24,14 @@ struct FQESingleGameData
 	// ISO8601 string representation of the date time this game was completed
 	UPROPERTY(BlueprintReadWrite)
 	FString CompleteDateTime;
+	// Did the player complete the level?
+	UPROPERTY(BlueprintReadWrite)
+	bool CompletedLevel;
 
 	// Default constructor
 	FORCEINLINE FQESingleGameData();
 	// Constructor with all properties
-	explicit FORCEINLINE FQESingleGameData(float time, float score, FString isoDateTimeStr = "");
+	explicit FORCEINLINE FQESingleGameData(float time, float score, bool didComplete, FString isoDateTimeStr = "");
 };
 
 FORCEINLINE FQESingleGameData::FQESingleGameData()
@@ -36,12 +39,14 @@ FORCEINLINE FQESingleGameData::FQESingleGameData()
 	CompleteDateTime = FDateTime::UtcNow().ToIso8601();
 	CompleteSeconds = 0.0f;
 	Score = 0.0f;
+	CompletedLevel = false;
 }
 
-FORCEINLINE FQESingleGameData::FQESingleGameData(const float time, const float score, FString isoDateTimeStr)
+FORCEINLINE FQESingleGameData::FQESingleGameData(const float time, const float score, bool didComplete, FString isoDateTimeStr)
 {
 	CompleteSeconds = time;
 	Score = score;
+	CompletedLevel = didComplete;
 
 	// If no iso string, set datetime to now
 	if (isoDateTimeStr.IsEmpty())

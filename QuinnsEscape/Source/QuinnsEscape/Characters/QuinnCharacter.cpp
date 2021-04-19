@@ -33,6 +33,9 @@ AQuinnCharacter::AQuinnCharacter()
 	StartLives = 3;
 	LastCheckpoint = nullptr;		// Nullptr to start with
 
+	// Set hit/kill score to 0 as it's the player character
+	KilledScore = HitScore = 0;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
