@@ -3,6 +3,7 @@
 
 #include "VelocityLinkProxy.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AVelocityLinkProxy::AVelocityLinkProxy()
 {
@@ -34,6 +35,13 @@ void AVelocityLinkProxy::LaunchCharacter(AActor* MovingActor, const FVector& Des
 			// Determine velocity to launch character and launch
 			FVector velocity = CalculateVelocity(MovingActor->GetActorLocation(), DestinationPoint, JumpDuration);
 			character->LaunchCharacter(velocity, true, true);
+
+			// Determine facing direction of launch
+			FRotator lookAt = UKismetMathLibrary::FindLookAtRotation(MovingActor->GetActorLocation(), DestinationPoint);
+			FRotator rotation = MovingActor->GetActorRotation();
+			rotation.Yaw = lookAt.Yaw;
+			rotation.Roll = rotation.Pitch = 0.0f;	// Enforce other axis' to 0
+			MovingActor->SetActorRotation(rotation);
 		}
 	}
 }

@@ -94,6 +94,9 @@ void AShooterEnemy::ShootAtTarget()
 	 
 	if (IsValid(TargetCharacter))
 	{
+		// Set look at target when firing
+		this->LookAtTarget(TargetCharacter->GetActorLocation());
+		
 		// Determine direction projectile should fly to get from current location to target character location
 		FVector targetLocation = TargetCharacter->GetActorLocation();
 		FVector projectileDirection = targetLocation - this->GetActorLocation();
@@ -125,7 +128,7 @@ void AShooterEnemy::LookAtTarget(FVector targetLocation)
 	// Set Actor to look at target actor
 	FRotator lookAt = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), targetLocation);
 	FRotator actorRotation = this->GetActorRotation();
-	actorRotation.Yaw = lookAt.Yaw + -90.0f;			// Add Yaw offset
+	actorRotation.Yaw = lookAt.Yaw;
 	actorRotation.Roll = actorRotation.Pitch = 0.0f;	// Enforce other axis' to 0
 
 	this->SetActorRotation(actorRotation);

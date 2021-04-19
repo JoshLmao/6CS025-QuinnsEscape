@@ -184,6 +184,12 @@ void AShooterFSMController::Chasing_Tick(float deltaTime)
 			// In range, set to shooting
 			SetShooterState(EShooterStates::Shooting);
 		}
+
+		// When left detection radius, set back to idle
+		if (!IsInDetectionRadius(TargetCharacter))
+		{
+ 			SetShooterState(EShooterStates::Idle);
+		}
 	}
 }
 
