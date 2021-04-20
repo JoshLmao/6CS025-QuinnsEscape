@@ -150,7 +150,7 @@ void AShooterEnemy::BeginShooting()
 		GetWorldTimerManager().ClearTimer(m_fireDelayHandle);
 	}
 
-	// Start timer normally
+	// Start timer normally. Set to loop and have initial delay of 0 to fire right away
 	GetWorldTimerManager().SetTimer(m_fireDelayHandle, this, &AShooterEnemy::ShootAtTarget, ShootingInteval, true, 0.0f);
 }
 

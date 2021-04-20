@@ -81,9 +81,10 @@ protected:
 	virtual void BeginPlay() override;
 	// Apply the powerup effects to the collided pawn.
 	virtual void ApplyEffects(APawn* collidedPawn);
+#if WITH_EDITOR
 	// When property gets updated in editor
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
-
+#endif
 	// Gets the game state and casts it to AQuinnGameState
 	class AQuinnGameState* GetQuinnGameState();
 

@@ -55,6 +55,7 @@ APowerupPickup::APowerupPickup()
 	AudioComponent->SetupAttachment(RootComponent);
 }
 
+#if WITH_EDITOR
 void APowerupPickup::PostEditChangeProperty(struct FPropertyChangedEvent& e)
 {
 	// Detect a property change in editor for LightColor
@@ -66,6 +67,7 @@ void APowerupPickup::PostEditChangeProperty(struct FPropertyChangedEvent& e)
 	}
 	Super::PostEditChangeProperty(e);
 }
+#endif
 
 // Called when the game starts or when spawned
 void APowerupPickup::BeginPlay()
