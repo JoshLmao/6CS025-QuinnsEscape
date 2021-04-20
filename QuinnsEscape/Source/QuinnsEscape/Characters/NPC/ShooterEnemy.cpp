@@ -151,7 +151,7 @@ void AShooterEnemy::BeginShooting()
 	}
 
 	// Start timer normally
-	GetWorldTimerManager().SetTimer(m_fireDelayHandle, this, &AShooterEnemy::ShootAtTarget, ShootingInteval, true);
+	GetWorldTimerManager().SetTimer(m_fireDelayHandle, this, &AShooterEnemy::ShootAtTarget, ShootingInteval, true, 0.0f);
 }
 
 void AShooterEnemy::StopShooting()
